@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Music, Heart, DollarSign, Send, Sparkles, User, LogOut, CreditCard, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import djHeroBg from "@/assets/dj-hero-bg.jpg";
-import djWackoMainLogo from "@/assets/dj-wacko-main-logo.gif";
+import djWackoMainLogo from "@/assets/dj-wacko-main-logo.png";
 import djWackoLogoText from "@/assets/dj-wacko-logo-text.png";
 
 const genres = [
@@ -47,9 +47,39 @@ const Index = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
+  const [currentRequestId, setCurrentRequestId] = useState(null);
 
+  useEffect(() => {
+    // Check authentication status
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user || null);
+    };
+    getSession();
 
-  const verifyPayment = useCallback(async (sessionId: string) => {
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user || null);
+    });
+
+    // Check for payment success
+    const paymentStatus = searchParams.get('payment');
+    const sessionId = searchParams.get('session_id');
+    
+    if (paymentStatus === 'success' && sessionId) {
+      verifyPayment(sessionId);
+    } else if (paymentStatus === 'cancelled') {
+      toast({
+        title: "Pago cancelado",
+        description: "El pago fue cancelado. Puedes intentar nuevamente.",
+        variant: "destructive",
+      });
+    }
+
+    return () => subscription.unsubscribe();
+  }, [searchParams, toast]);
+
+  const verifyPayment = async (sessionId: string) => {
     try {
       const { data, error } = await supabase.functions.invoke('verify-payment', {
         body: { session_id: sessionId }
@@ -66,38 +96,7 @@ const Index = () => {
     } catch (error) {
       console.error('Error verifying payment:', error);
     }
-  }, [toast]);
-
-  useEffect(() => {
-    // Check authentication status
-    const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user || null);
-    };
-    getSession();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user || null);
-    });
-
-    // Check for payment success
-    try {
-      const paymentStatus = searchParams.get('payment');
-      const sessionId = searchParams.get('session_id');
-      
-      if (paymentStatus === 'success' && sessionId) {
-        verifyPayment(sessionId);
-      } else if (paymentStatus === 'cancelled') {
-        toast({
-          title: "Pago cancelado",
-          description: "Tu canción ha sido agregada a la lista con prioridad.",
-        });
-      }
-    } catch (error) {
-      console.error('Error verifying payment:', error);
-    }
-  }, [toast, searchParams, verifyPayment]);
+  };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -206,15 +205,15 @@ const Index = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-2 sm:px-4 py-8">
+      <div className="relative z-10 container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="text-center mb-12 px-2 sm:px-0">
+        <div className="text-center mb-12">
           {/* Main Logo */}
           <div className="flex justify-center mb-6 animate-fade-in">
             <img 
               src={djWackoMainLogo} 
               alt="DJ Wacko" 
-              className="w-32 h-32 sm:w-48 sm:h-48 object-contain hover-scale transition-transform duration-500"
+              className="w-48 h-48 object-contain hover-scale transition-transform duration-500"
             />
           </div>
           
@@ -229,7 +228,7 @@ const Index = () => {
           </div>
           
           {/* Contact Info */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 mb-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>
             <a 
               href="https://wa.me/5256441274646" 
               target="_blank" 
@@ -249,7 +248,7 @@ const Index = () => {
           </div>
           
           {/* Subtle tip message */}
-          <div className="flex flex-wrap items-center justify-center gap-2 mb-8 animate-fade-in text-base sm:text-lg" style={{ animationDelay: '0.6s' }}>
+          <div className="flex items-center justify-center gap-2 mb-8 animate-fade-in" style={{ animationDelay: '0.6s' }}>
             <Heart className="w-5 h-5 text-neon-pink animate-pulse" />
             <span className="text-lg font-medium text-foreground/80">
               🎵 Solicita tu canción favorita
@@ -259,8 +258,8 @@ const Index = () => {
         </div>
 
         {/* Main Content */}
-        <div className="max-w-full sm:max-w-2xl mx-auto px-1 sm:px-0">
-          <Card className="bg-card/80 backdrop-blur-sm border-primary/20 shadow-glow w-full">
+        <div className="max-w-2xl mx-auto">
+          <Card className="bg-card/80 backdrop-blur-sm border-primary/20 shadow-glow">
             <CardHeader className="text-center">
               <CardTitle className="text-3xl font-bold text-foreground">
                 🎵 Solicitar Canción
@@ -282,7 +281,7 @@ const Index = () => {
                     placeholder="Ej: Gasolina"
                     value={formData.song}
                     onChange={(e) => setFormData({ ...formData, song: e.target.value })}
-                    className="bg-background/50 border-primary/30 focus:border-primary focus:scale-105 transition-all duration-300 w-full"
+                    className="bg-background/50 border-primary/30 focus:border-primary focus:scale-105 transition-all duration-300"
                     required
                   />
                 </div>
@@ -297,7 +296,7 @@ const Index = () => {
                     placeholder="Ej: Daddy Yankee"
                     value={formData.artist}
                     onChange={(e) => setFormData({ ...formData, artist: e.target.value })}
-                    className="bg-background/50 border-primary/30 focus:border-primary focus:scale-105 transition-all duration-300 w-full"
+                    className="bg-background/50 border-primary/30 focus:border-primary focus:scale-105 transition-all duration-300"
                     required
                   />
                 </div>
@@ -312,7 +311,7 @@ const Index = () => {
                     placeholder="¿Cómo te llamas?"
                     value={formData.requesterName}
                     onChange={(e) => setFormData({ ...formData, requesterName: e.target.value })}
-                    className="bg-background/50 border-primary/30 focus:border-primary focus:scale-105 transition-all duration-300 w-full"
+                    className="bg-background/50 border-primary/30 focus:border-primary focus:scale-105 transition-all duration-300"
                   />
                 </div>
 
@@ -322,7 +321,7 @@ const Index = () => {
                     🎼 Género (opcional)
                   </Label>
                   <Select value={formData.genre} onValueChange={(value) => setFormData({ ...formData, genre: value })}>
-                    <SelectTrigger className="bg-background/50 border-primary/30 focus:border-primary focus:scale-105 transition-all duration-300 w-full">
+                    <SelectTrigger className="bg-background/50 border-primary/30 focus:border-primary focus:scale-105 transition-all duration-300">
                       <SelectValue placeholder="Selecciona un género" />
                     </SelectTrigger>
                     <SelectContent>
@@ -350,7 +349,7 @@ const Index = () => {
                       placeholder="2.00"
                       value={formData.tip}
                       onChange={(e) => setFormData({ ...formData, tip: e.target.value })}
-                      className="pl-10 bg-background/50 border-primary/30 focus:border-primary focus:scale-105 transition-all duration-300 w-full"
+                      className="pl-10 bg-background/50 border-primary/30 focus:border-primary focus:scale-105 transition-all duration-300"
                       required
                     />
                   </div>
@@ -369,7 +368,7 @@ const Index = () => {
                     placeholder="@tu_usuario"
                     value={formData.telegram}
                     onChange={(e) => setFormData({ ...formData, telegram: e.target.value })}
-                    className="bg-background/50 border-primary/30 focus:border-primary focus:scale-105 transition-all duration-300 w-full"
+                    className="bg-background/50 border-primary/30 focus:border-primary focus:scale-105 transition-all duration-300"
                   />
                   <p className="text-xs text-muted-foreground">
                     Para recibir confirmación cuando tu canción sea reproducida
@@ -418,7 +417,7 @@ const Index = () => {
             <Button 
               variant="outline" 
               onClick={() => navigate('/admin')}
-              className="text-sm w-full sm:w-auto"
+              className="text-sm"
             >
               🎧 Acceso DJ
             </Button>
@@ -430,7 +429,7 @@ const Index = () => {
           <img 
             src={djWackoLogoText} 
             alt="DJ Wacko Logo" 
-            className="mx-auto w-40 sm:w-64 h-auto object-contain opacity-60 hover:opacity-100 transition-all duration-500 hover-scale"
+            className="mx-auto w-64 h-auto object-contain opacity-60 hover:opacity-100 transition-all duration-500 hover-scale"
           />
         </div>
       </div>

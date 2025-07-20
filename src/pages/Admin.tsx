@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -54,9 +54,13 @@ const Admin = () => {
     return () => subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (user) {
+      fetchRequests();
+    }
+  }, [user]);
 
-  // Declarar fetchRequests antes del useEffect para evitar error de uso antes de declaración
-  const fetchRequests = useCallback(async () => {
+  const fetchRequests = async () => {
     try {
       setRefreshing(true);
       const { data: pendingRequests, error: pendingError } = await supabase
@@ -87,13 +91,7 @@ const Admin = () => {
     } finally {
       setRefreshing(false);
     }
-  }, [toast]);
-
-  useEffect(() => {
-    if (user) {
-      fetchRequests();
-    }
-  }, [user, fetchRequests]);
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -111,11 +109,10 @@ const Admin = () => {
         title: "¡Bienvenido DJ Wacko!",
         description: "Acceso concedido al panel de administración"
       });
-    } catch (error) {
-      const err = error as { message?: string };
+    } catch (error: any) {
       toast({
         title: "Error de acceso",
-        description: err.message || "Credenciales incorrectas",
+        description: error.message || "Credenciales incorrectas",
         variant: "destructive"
       });
     } finally {
@@ -140,11 +137,10 @@ const Admin = () => {
       });
       setShowResetPassword(false);
       setResetEmail("");
-    } catch (error) {
-      const err = error as { message?: string };
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: err.message || "No se pudo enviar el email",
+        description: error.message || "No se pudo enviar el email",
         variant: "destructive"
       });
     } finally {
@@ -270,7 +266,7 @@ const Admin = () => {
                     <Input
                       id="email"
                       type="email"
-                      placeholder=""
+                      placeholder="djwacko@outlook.es"
                       value={loginForm.email}
                       onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
                       className="bg-background/50 border-primary/30"
@@ -350,10 +346,10 @@ const Admin = () => {
   }
 
   return (
-      <div className="min-h-screen bg-background p-2 sm:p-4">
-      <div className="container mx-auto max-w-full sm:max-w-6xl">
+    <div className="min-h-screen bg-background p-4">
+      <div className="container mx-auto max-w-6xl">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 px-2 sm:px-0">
+        <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
             <Music className="w-8 h-8 text-primary" />
             <h1 className="text-3xl font-bold text-foreground">Panel DJ Wacko</h1>
@@ -380,7 +376,7 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="queue" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-8 text-base sm:text-lg">
+          <TabsList className="grid w-full grid-cols-2 mb-8">
             <TabsTrigger value="queue" className="text-lg">
               🎵 Cola de Solicitudes ({requests.length})
             </TabsTrigger>
@@ -405,11 +401,11 @@ const Admin = () => {
               </Card>
             ) : (
               requests.map((request, index) => (
-                <Card key={request.id} className="bg-card/80 border-primary/20 w-full">
-                  <CardContent className="p-4 sm:p-6">
-                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
+                <Card key={request.id} className="bg-card/80 border-primary/20">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
                           <Badge variant="secondary" className="text-xs">
                             #{index + 1}
                           </Badge>
@@ -430,7 +426,7 @@ const Admin = () => {
                           {request.artist_name}
                         </p>
                         
-                        <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-3 text-xs sm:text-sm text-muted-foreground">
+                        <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
                           <div className="flex items-center gap-1">
                             <Clock className="w-4 h-4" />
                             {new Date(request.created_at).toLocaleString()}
@@ -450,7 +446,7 @@ const Admin = () => {
                         </div>
                       </div>
                       
-                      <div className="flex flex-row flex-wrap items-center gap-2 mt-4 md:mt-0">
+                      <div className="flex items-center gap-2">
                         <Button
                           className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
                           size="lg"
@@ -490,11 +486,11 @@ const Admin = () => {
               </Card>
             ) : (
               history.map((item) => (
-                <Card key={item.id} className="bg-card/80 border-primary/20 w-full">
-                  <CardContent className="p-4 sm:p-6">
-                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
+                <Card key={item.id} className="bg-card/80 border-primary/20">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
                           <Badge 
                             variant={item.played_status === "playing" ? "default" : "secondary"}
                             className={item.played_status === "playing" ? "bg-gradient-electric text-white animate-pulse" : ""}
@@ -511,14 +507,14 @@ const Admin = () => {
                           )}
                         </div>
                         
-                        <h3 className="text-base sm:text-xl font-bold text-foreground">
+                        <h3 className="text-xl font-bold text-foreground">
                           {item.song_name}
                         </h3>
-                        <p className="text-sm sm:text-lg text-muted-foreground">
+                        <p className="text-lg text-muted-foreground">
                           {item.artist_name}
                         </p>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-3 text-xs sm:text-sm text-muted-foreground">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-3 text-sm text-muted-foreground">
                           <div className="flex items-center gap-1">
                             <Clock className="w-4 h-4" />
                             Solicitada: {new Date(item.created_at).toLocaleString()}
@@ -532,7 +528,7 @@ const Admin = () => {
                         </div>
                         
                         {(item.requester_name || item.telegram_username) && (
-                        <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 text-xs sm:text-sm text-muted-foreground">
+                          <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
                             {item.requester_name && (
                               <span>{item.requester_name}</span>
                             )}
@@ -546,7 +542,7 @@ const Admin = () => {
                         )}
                       </div>
                       
-                      <div className="flex flex-row flex-wrap items-center gap-2 mt-4 md:mt-0">
+                      <div className="flex items-center gap-2">
                         {item.played_status === "playing" && (
                           <Button
                             className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white"
