@@ -34,13 +34,6 @@ const Auth = () => {
   const [activeTab, setActiveTab] = useState<'signin' | 'signup'>('signin');
   const [shake, setShake] = useState(false);
 
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-
   useEffect(() => {
     // Check if user is already logged in
     const checkAuth = async () => {
@@ -80,8 +73,8 @@ const Auth = () => {
       setName("");
     } catch (error: unknown) {
       let message = "Error desconocido";
-      if (error && typeof error === "object" && "message" in error && typeof (error as any).message === "string") {
-        message = (error as any).message;
+      if (error && typeof error === "object" && "message" in error && typeof (error as { message?: unknown }).message === "string") {
+        message = (error as { message: string }).message;
       }
       toast({
         title: "Error en el registro",
@@ -113,8 +106,8 @@ const Auth = () => {
       navigate("/");
     } catch (error: unknown) {
       let message = "Error desconocido";
-      if (error && typeof error === "object" && "message" in error && typeof (error as any).message === "string") {
-        message = (error as any).message;
+      if (error && typeof error === "object" && "message" in error && typeof (error as { message?: unknown }).message === "string") {
+        message = (error as { message: string }).message;
       }
       toast({
         title: "Error al iniciar sesión",
@@ -149,8 +142,8 @@ const Auth = () => {
       });
     } catch (error: unknown) {
       let message = "Error desconocido";
-      if (error && typeof error === "object" && "message" in error && typeof (error as any).message === "string") {
-        message = (error as any).message;
+      if (error && typeof error === "object" && "message" in error && typeof (error as { message?: unknown }).message === "string") {
+        message = (error as { message: string }).message;
       }
       toast({
         title: "Error",
