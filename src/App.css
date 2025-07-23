@@ -64,21 +64,46 @@
 
 /* Glassmorphism para la tarjeta */
 .auth-card-glass {
-  background: rgba(255,255,255,0.09);
+  background: rgba(255,255,255,0.16); /* Más translúcido */
   border-radius: 1.5rem;
   box-shadow: 0 8px 32px 0 rgba(31,38,135,0.17);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.18);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.20);
   position: relative;
   z-index: 1;
+  padding: 2.5rem 2rem;
+  transition: box-shadow 0.3s, background 0.3s;
+}
+
+@media (max-width: 600px) {
+  .auth-card-glass {
+    padding: 1.2rem 0.5rem;
+    border-radius: 1rem;
+  }
 }
 
 /* Animaciones de focus y hover para inputs */
 .auth-input {
+  background: rgba(255,255,255,0.7) !important;
+  color: #1a2980 !important;
+  border: 1.5px solid rgba(162,89,255,0.18);
+  border-radius: 0.75rem;
+  font-weight: 500;
+  transition: box-shadow 0.3s, border-color 0.3s, background 0.3s, color 0.3s;
+  box-shadow: 0 2px 8px rgba(162,89,255,0.07);
+} {
   transition: box-shadow 0.3s, border-color 0.3s;
   box-shadow: 0 1px 4px rgba(80,0,160,0.07);
 }
-.auth-input:focus {
+.auth-input {
+  background: rgba(255,255,255,0.7) !important;
+  color: #1a2980 !important;
+  border: 1.5px solid rgba(162,89,255,0.18);
+  border-radius: 0.75rem;
+  font-weight: 500;
+  transition: box-shadow 0.3s, border-color 0.3s, background 0.3s, color 0.3s;
+  box-shadow: 0 2px 8px rgba(162,89,255,0.07);
+}:focus {
   border-color: #a259ff;
   box-shadow: 0 0 0 5px rgba(162,89,255,0.28), 0 2px 8px #a259ff33;
   transform: scale(1.03);
@@ -87,10 +112,62 @@
 
 /* Botón principal animado */
 .auth-btn-main {
+  width: 100%;
+  background: linear-gradient(90deg, #a259ff 0%, #26d0ce 100%) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  box-shadow: 0 2px 12px 0 rgba(162,89,255,0.14);
+  padding: 0.85rem 0;
+  font-size: 1.1rem;
+  letter-spacing: 0.02em;
+  transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+  outline: none;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  animation: fadeInUp 0.8s cubic-bezier(0.33, 1, 0.68, 1);
+}
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(36px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+} {
   transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
   box-shadow: 0 2px 12px 0 rgba(162,89,255,0.14);
 }
-.auth-btn-main:hover {
+.auth-btn-main {
+  width: 100%;
+  background: linear-gradient(90deg, #a259ff 0%, #26d0ce 100%) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  box-shadow: 0 2px 12px 0 rgba(162,89,255,0.14);
+  padding: 0.85rem 0;
+  font-size: 1.1rem;
+  letter-spacing: 0.02em;
+  transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+  outline: none;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  animation: fadeInUp 0.8s cubic-bezier(0.33, 1, 0.68, 1);
+}
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(36px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}:hover {
   background: linear-gradient(90deg, #a259ff 0%, #26d0ce 100%);
   transform: scale(1.07) translateY(-4px) rotate(-1deg);
   box-shadow: 0 8px 32px 0 #a259ff44, 0 2px 12px 0 rgba(162,89,255,0.20);
@@ -98,7 +175,23 @@
 }
 
 /* Microinteracción para iconos de input */
-.auth-input:focus + .auth-input-icon {
+.auth-input {
+  background: rgba(255,255,255,0.7) !important;
+  color: #1a2980 !important;
+  border: 1.5px solid rgba(162,89,255,0.18);
+  border-radius: 0.75rem;
+  font-weight: 500;
+  transition: box-shadow 0.3s, border-color 0.3s, background 0.3s, color 0.3s;
+  box-shadow: 0 2px 8px rgba(162,89,255,0.07);
+}:focus + .auth-input {
+  background: rgba(255,255,255,0.7) !important;
+  color: #1a2980 !important;
+  border: 1.5px solid rgba(162,89,255,0.18);
+  border-radius: 0.75rem;
+  font-weight: 500;
+  transition: box-shadow 0.3s, border-color 0.3s, background 0.3s, color 0.3s;
+  box-shadow: 0 2px 8px rgba(162,89,255,0.07);
+}-icon {
   color: #a259ff;
   transform: scale(1.15);
   transition: color 0.2s, transform 0.2s;
@@ -129,6 +222,15 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* Responsive background */
+@media (max-width: 600px) {
+  .auth-bg {
+    padding: 0 !important;
+    min-height: 100vh;
+    background-size: 200% 200%;
   }
 }
 
