@@ -8,10 +8,10 @@ const Terms = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-2 md:p-4 flex flex-col">
       <div className="absolute inset-0 bg-black/20"></div>
       
-      <div className="relative z-10 max-w-4xl mx-auto">
+      <div className="container mx-auto max-w-4xl flex-1 flex flex-col justify-center">
         <div className="flex items-center justify-between mb-8">
           <Button
             variant="ghost"

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -53,13 +53,7 @@ const UserHistory = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  useEffect(() => {
-    if (user) {
-      fetchUserHistory();
-    }
-  }, [user]);
-
-  const fetchUserHistory = async () => {
+  const fetchUserHistory = useCallback(async () => {
     if (!user?.email) return;
     
     try {
@@ -82,7 +76,13 @@ const UserHistory = () => {
     } finally {
       setRefreshing(false);
     }
-  };
+  }, [user, toast]);
+
+  useEffect(() => {
+    if (user) {
+      fetchUserHistory();
+    }
+  }, [user, fetchUserHistory]);
 
   const handleReorder = (request: UserSongRequest) => {
     // Pre-fill form data and navigate to main page
@@ -124,8 +124,8 @@ const UserHistory = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-background flex flex-col">
+      <div className="container mx-auto px-2 md:px-6 py-6 flex-1 flex flex-col">
         <div className="flex items-center gap-4 mb-8">
           <Button
             variant="ghost"
