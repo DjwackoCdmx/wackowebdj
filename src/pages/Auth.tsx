@@ -8,7 +8,21 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { User, Mail, Lock, UserPlus, LogIn, Music } from "lucide-react";
-import djWackoMainLogo from "@/assets/dj-wacko-main-logo.png";
+import djWackoMainLogo from "@/assets/dj-wacko-main-logo.gif";
+
+// Utilidad para obtener mensaje seguro de error
+function getErrorMessage(error: unknown): string {
+  if (typeof error === "string") return error;
+  if (
+    error &&
+    typeof error === "object" &&
+    "message" in error &&
+    typeof (error as { message?: unknown }).message === "string"
+  ) {
+    return (error as { message: string }).message;
+  }
+  return "Error desconocido";
+}
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -55,10 +69,14 @@ const Auth = () => {
       setEmail("");
       setPassword("");
       setName("");
-    } catch (error: any) {
+    } catch (error: unknown) {
+      let message = "Error desconocido";
+      if (error && typeof error === "object" && "message" in error && typeof (error as any).message === "string") {
+        message = (error as any).message;
+      }
       toast({
         title: "Error en el registro",
-        description: error.message,
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     } finally {
@@ -84,10 +102,14 @@ const Auth = () => {
       });
       
       navigate("/");
-    } catch (error: any) {
+    } catch (error: unknown) {
+      let message = "Error desconocido";
+      if (error && typeof error === "object" && "message" in error && typeof (error as any).message === "string") {
+        message = (error as any).message;
+      }
       toast({
         title: "Error al iniciar sesión",
-        description: error.message,
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     } finally {
@@ -116,20 +138,24 @@ const Auth = () => {
         title: "Email enviado",
         description: "Revisa tu email para las instrucciones de recuperación.",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      let message = "Error desconocido";
+      if (error && typeof error === "object" && "message" in error && typeof (error as any).message === "string") {
+        message = (error as any).message;
+      }
       toast({
         title: "Error",
-        description: error.message,
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
+    <div className="auth-bg min-h-screen flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/20"></div>
       
-      <Card className="w-full max-w-md relative z-10 bg-white/10 backdrop-blur-lg border-white/20">
+      <Card className="w-full max-w-md relative z-10 auth-card-glass auth-card-animate">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <img 
@@ -148,7 +174,7 @@ const Auth = () => {
         </CardHeader>
         
         <CardContent>
-          <Tabs defaultValue="signin" className="space-y-4">
+          <Tabs defaultValue="signin" className="auth-tabs auth-tabs-animate space-y-4">
             <TabsList className="grid w-full grid-cols-2 bg-white/10 backdrop-blur">
               <TabsTrigger value="signin" className="data-[state=active]:bg-white/20">
                 <LogIn className="w-4 h-4 mr-2" />
@@ -160,7 +186,7 @@ const Auth = () => {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="signin" className="space-y-4">
+            <TabsContent value="signin" className="auth-tabs-animate space-y-4">
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="signin-email" className="text-white">Email</Label>
@@ -172,7 +198,7 @@ const Auth = () => {
                       placeholder="tu@email.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/60"
+                      className="auth-input pl-10"
                       required
                     />
                   </div>
@@ -188,7 +214,7 @@ const Auth = () => {
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/60"
+                      className="auth-input pl-10"
                       required
                     />
                   </div>
@@ -196,7 +222,7 @@ const Auth = () => {
 
                 <Button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                  className="auth-btn-main w-full"
                   disabled={isLoading}
                 >
                   {isLoading ? "Iniciando..." : "Iniciar Sesión"}
@@ -205,7 +231,7 @@ const Auth = () => {
                 <Button
                   type="button"
                   variant="ghost"
-                  className="w-full text-white/80 hover:text-white hover:bg-white/10"
+                  className="auth-btn-ghost w-full"
                   onClick={handleResetPassword}
                 >
                   ¿Olvidaste tu contraseña?
@@ -213,7 +239,7 @@ const Auth = () => {
               </form>
             </TabsContent>
 
-            <TabsContent value="signup" className="space-y-4">
+            <TabsContent value="signup" className="auth-tabs-animate space-y-4">
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="signup-name" className="text-white">Nombre</Label>
@@ -225,7 +251,7 @@ const Auth = () => {
                       placeholder="Tu nombre"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/60"
+                      className="auth-input pl-10"
                       required
                     />
                   </div>
@@ -241,7 +267,7 @@ const Auth = () => {
                       placeholder="tu@email.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/60"
+                      className="auth-input pl-10"
                       required
                     />
                   </div>
@@ -257,7 +283,7 @@ const Auth = () => {
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/60"
+                      className="auth-input pl-10"
                       required
                       minLength={6}
                     />
@@ -266,7 +292,7 @@ const Auth = () => {
 
                 <Button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                  className="auth-btn-main w-full"
                   disabled={isLoading}
                 >
                   {isLoading ? "Registrando..." : "Crear Cuenta"}
@@ -278,7 +304,7 @@ const Auth = () => {
           <div className="mt-6 text-center">
             <Button
               variant="ghost"
-              className="text-white/80 hover:text-white hover:bg-white/10"
+              className="auth-btn-ghost"
               onClick={() => navigate("/")}
             >
               ← Volver al inicio

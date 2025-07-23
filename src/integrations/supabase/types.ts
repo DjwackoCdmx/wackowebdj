@@ -64,6 +64,36 @@ export type Database = {
           },
         ]
       }
+      schedule_settings: {
+        Row: {
+          created_at: string
+          day_of_week: number
+          end_time: string
+          id: string
+          is_active: boolean
+          start_time: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          day_of_week: number
+          end_time: string
+          id?: string
+          is_active?: boolean
+          start_time: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          day_of_week?: number
+          end_time?: string
+          id?: string
+          is_active?: boolean
+          start_time?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       song_requests: {
         Row: {
           artist_name: string
@@ -81,6 +111,7 @@ export type Database = {
           telegram_username: string | null
           tip_amount: number
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           artist_name: string
@@ -98,6 +129,7 @@ export type Database = {
           telegram_username?: string | null
           tip_amount: number
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           artist_name?: string
@@ -115,6 +147,34 @@ export type Database = {
           telegram_username?: string | null
           tip_amount?: number
           updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      user_profiles: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          name: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          name?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string | null
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -123,7 +183,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_request_time_allowed: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

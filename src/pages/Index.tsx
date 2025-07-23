@@ -7,47 +7,42 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Music, Heart, DollarSign, Send, Sparkles, User, LogOut, CreditCard, FileText } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Music, Heart, DollarSign, Send, Sparkles, User, LogOut, CreditCard, FileText, History, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import djHeroBg from "@/assets/dj-hero-bg.jpg";
-import djWackoMainLogo from "@/assets/dj-wacko-main-logo.png";
+import djWackoMainLogo from "@/assets/dj-wacko-main-logo.gif";
 import djWackoLogoText from "@/assets/dj-wacko-logo-text.png";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
 
-const genres = [
-  "Electronic",
-  "Hip Hop",
-  "Pop",
-  "Rock",
-  "Reggaeton",
-  "Salsa",
-  "Bachata",
-  "Merengue",
-  "Trap",
-  "House",
-  "Techno",
-  "Drum & Bass",
-  "Dubstep",
-  "R&B",
-  "Funk",
-  "Disco"
+const musicGenres = [
+  "Reggaeton", "Techno", "House", "Electro", "EDM", "Hip-Hop", "Trap", 
+  "Pop", "Rock", "Cumbia", "Salsa", "Bachata", "Merengue", "Regional Mexicano",
+  "Funk", "Disco", "Trance", "Dubstep", "Drum & Bass", "Ambient", "Progressive",
+  "Deep House", "Tech House", "Minimal", "Banda", "Circuit", "Otros"
 ];
 
 const Index = () => {
-  const navigate = useNavigate();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [isRequestTimeAllowed, setIsRequestTimeAllowed] = useState(true);
+  const [scheduleMessage, setScheduleMessage] = useState("");
   const [formData, setFormData] = useState({
-    song: "",
-    artist: "",
+    songName: "",
+    artistName: "",
     genre: "",
     tip: "",
     telegram: "",
     requesterName: ""
   });
+  const [customGenre, setCustomGenre] = useState("");
+  const [showCustomGenre, setShowCustomGenre] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
-  const [currentRequestId, setCurrentRequestId] = useState(null);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   useEffect(() => {
     // Check authentication status
@@ -61,6 +56,21 @@ const Index = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user || null);
     });
+
+    // Check if we have reorder data from localStorage
+    const reorderData = localStorage.getItem('reorderData');
+    if (reorderData) {
+      const parsedData = JSON.parse(reorderData);
+      setFormData(parsedData);
+      localStorage.removeItem('reorderData');
+      toast({
+        title: "Datos cargados",
+        description: "Se han cargado los datos de tu solicitud anterior",
+      });
+    }
+
+    // Check request time restrictions
+    checkRequestTimeAllowed();
 
     // Check for payment success
     const paymentStatus = searchParams.get('payment');
@@ -78,6 +88,23 @@ const Index = () => {
 
     return () => subscription.unsubscribe();
   }, [searchParams, toast]);
+
+  const checkRequestTimeAllowed = async () => {
+    try {
+      const { data, error } = await supabase.rpc('is_request_time_allowed');
+      if (error) throw error;
+      
+      setIsRequestTimeAllowed(data);
+      
+      if (!data) {
+        setScheduleMessage("Las solicitudes están temporalmente cerradas fuera del horario establecido. Vuelve más tarde.");
+      }
+    } catch (error) {
+      console.error('Error checking request time:', error);
+      // If there's an error, allow requests by default
+      setIsRequestTimeAllowed(true);
+    }
+  };
 
   const verifyPayment = async (sessionId: string) => {
     try {
@@ -132,10 +159,20 @@ const Index = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.song || !formData.artist || parseFloat(formData.tip) < 2) {
+    
+    if (!isRequestTimeAllowed) {
+      toast({
+        title: "Solicitudes cerradas",
+        description: scheduleMessage,
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!formData.songName || !formData.artistName || parseFloat(formData.tip) < 2 || !acceptedTerms) {
       toast({
         title: "Error en la solicitud",
-        description: "Por favor completa los campos obligatorios y asegúrate que la propina sea mínimo $2 USD",
+        description: !acceptedTerms ? "Debes aceptar los términos y condiciones" : "Por favor completa los campos obligatorios y asegúrate que la propina sea mínimo $2 USD",
         variant: "destructive"
       });
       return;
@@ -144,36 +181,48 @@ const Index = () => {
     setIsSubmitting(true);
 
     try {
+      const finalGenre = formData.genre === "Otros" ? customGenre || "Otros" : formData.genre;
+      
       const { data, error } = await supabase
         .from('song_requests')
         .insert({
-          song_name: formData.song,
-          artist_name: formData.artist,
-          genre: formData.genre || null,
-          requester_name: formData.requesterName || null,
+          song_name: formData.songName,
+          artist_name: formData.artistName,
+          genre: finalGenre || null,
+          requester_name: formData.requesterName || (user?.email) || null,
           telegram_username: formData.telegram || null,
           tip_amount: parseFloat(formData.tip),
-          payment_status: 'pending'
+          payment_status: 'pending',
+          user_id: user?.id || null
         })
         .select()
         .single();
 
       if (error) throw error;
 
+      // Show payment options after successful request creation
+      setShowPayment(true);
+      
       toast({
         title: "¡Solicitud enviada exitosamente! 🎵",
-        description: `Tu solicitud de "${formData.song}" por ${formData.artist} ha sido guardada. Procede con el pago para confirmarla.`,
+        description: `Tu solicitud de "${formData.songName}" por ${formData.artistName} ha sido guardada. Procede con el pago para confirmarla.`,
       });
+
+      // Store the request ID and amount for payment
+      localStorage.setItem('currentRequestId', data.id);
+      localStorage.setItem('currentTipAmount', formData.tip);
 
       // Reset form
       setFormData({
-        song: "",
-        artist: "",
+        songName: "",
+        artistName: "",
         genre: "",
         tip: "",
         telegram: "",
         requesterName: ""
       });
+      setCustomGenre("");
+      setAcceptedTerms(false);
 
     } catch (error) {
       console.error('Error al enviar solicitud:', error);
@@ -208,6 +257,42 @@ const Index = () => {
       <div className="relative z-10 container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">
+          {/* User Authentication Section */}
+          <div className="flex justify-end mb-6 gap-2">
+            {user ? (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => navigate('/user-history')}
+                  size="sm"
+                >
+                  <History className="w-4 h-4 mr-2" />
+                  Mi Historial
+                </Button>
+                <Badge variant="secondary" className="px-3 py-1">
+                  <User className="w-3 h-3 mr-1" />
+                  {user.email}
+                </Badge>
+                <Button
+                  variant="ghost"
+                  onClick={handleSignOut}
+                  size="sm"
+                >
+                  <LogOut className="w-4 h-4" />
+                </Button>
+              </div>
+            ) : (
+              <Button
+                variant="outline"
+                onClick={() => navigate('/auth')}
+                size="sm"
+              >
+                <User className="w-4 h-4 mr-2" />
+                Iniciar Sesión
+              </Button>
+            )}
+          </div>
+
           {/* Main Logo */}
           <div className="flex justify-center mb-6 animate-fade-in">
             <img 
@@ -247,6 +332,16 @@ const Index = () => {
             </a>
           </div>
           
+          {/* Schedule Message */}
+          {!isRequestTimeAllowed && (
+            <div className="mb-8 p-4 bg-yellow-600/20 border border-yellow-600/30 rounded-lg animate-fade-in">
+              <div className="flex items-center justify-center gap-2 text-yellow-400">
+                <Clock className="w-5 h-5" />
+                <span className="font-medium">{scheduleMessage}</span>
+              </div>
+            </div>
+          )}
+          
           {/* Subtle tip message */}
           <div className="flex items-center justify-center gap-2 mb-8 animate-fade-in" style={{ animationDelay: '0.6s' }}>
             <Heart className="w-5 h-5 text-neon-pink animate-pulse" />
@@ -273,14 +368,14 @@ const Index = () => {
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Song Name */}
                 <div className="space-y-2 animate-fade-in" style={{ animationDelay: '0.8s' }}>
-                  <Label htmlFor="song" className="text-sm font-medium text-foreground">
+                  <Label htmlFor="songName" className="text-sm font-medium text-foreground">
                     🎵 Nombre de la canción *
                   </Label>
                   <Input
-                    id="song"
+                    id="songName"
                     placeholder="Ej: Gasolina"
-                    value={formData.song}
-                    onChange={(e) => setFormData({ ...formData, song: e.target.value })}
+                    value={formData.songName}
+                    onChange={(e) => setFormData({ ...formData, songName: e.target.value })}
                     className="bg-background/50 border-primary/30 focus:border-primary focus:scale-105 transition-all duration-300"
                     required
                   />
@@ -288,14 +383,14 @@ const Index = () => {
 
                 {/* Artist */}
                 <div className="space-y-2 animate-fade-in" style={{ animationDelay: '1s' }}>
-                  <Label htmlFor="artist" className="text-sm font-medium text-foreground">
+                  <Label htmlFor="artistName" className="text-sm font-medium text-foreground">
                     👨‍🎤 Artista *
                   </Label>
                   <Input
-                    id="artist"
+                    id="artistName"
                     placeholder="Ej: Daddy Yankee"
-                    value={formData.artist}
-                    onChange={(e) => setFormData({ ...formData, artist: e.target.value })}
+                    value={formData.artistName}
+                    onChange={(e) => setFormData({ ...formData, artistName: e.target.value })}
                     className="bg-background/50 border-primary/30 focus:border-primary focus:scale-105 transition-all duration-300"
                     required
                   />
@@ -308,7 +403,7 @@ const Index = () => {
                   </Label>
                   <Input
                     id="requesterName"
-                    placeholder="¿Cómo te llamas?"
+                    placeholder={user ? user.email : "¿Cómo te llamas?"}
                     value={formData.requesterName}
                     onChange={(e) => setFormData({ ...formData, requesterName: e.target.value })}
                     className="bg-background/50 border-primary/30 focus:border-primary focus:scale-105 transition-all duration-300"
@@ -320,18 +415,34 @@ const Index = () => {
                   <Label htmlFor="genre" className="text-sm font-medium text-foreground">
                     🎼 Género (opcional)
                   </Label>
-                  <Select value={formData.genre} onValueChange={(value) => setFormData({ ...formData, genre: value })}>
+                  <Select 
+                    value={formData.genre} 
+                    onValueChange={(value) => {
+                      setFormData({ ...formData, genre: value });
+                      setShowCustomGenre(value === "Otros");
+                    }}
+                  >
                     <SelectTrigger className="bg-background/50 border-primary/30 focus:border-primary focus:scale-105 transition-all duration-300">
                       <SelectValue placeholder="Selecciona un género" />
                     </SelectTrigger>
                     <SelectContent>
-                      {genres.map((genre) => (
+                      {musicGenres.map((genre) => (
                         <SelectItem key={genre} value={genre}>
                           {genre}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
+                  
+                  {/* Custom Genre Input */}
+                  {showCustomGenre && (
+                    <Input
+                      placeholder="Especifica el género musical"
+                      value={customGenre}
+                      onChange={(e) => setCustomGenre(e.target.value)}
+                      className="bg-background/50 border-primary/30 focus:border-primary focus:scale-105 transition-all duration-300 mt-2"
+                    />
+                  )}
                 </div>
 
                 {/* Tip Amount */}
@@ -375,14 +486,78 @@ const Index = () => {
                   </p>
                 </div>
 
+                {/* Terms and Conditions */}
+                <div className="space-y-4 animate-fade-in" style={{ animationDelay: '1.9s' }}>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="terms" 
+                      checked={acceptedTerms}
+                      onCheckedChange={(checked) => setAcceptedTerms(checked === true)}
+                      className="border-primary/30"
+                    />
+                    <Label htmlFor="terms" className="text-sm text-foreground cursor-pointer">
+                      Acepto los{" "}
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="link" className="p-0 h-auto text-primary underline">
+                            términos y condiciones
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                          <DialogHeader>
+                            <DialogTitle className="text-center">🎶 Términos y Condiciones de Solicitudes Musicales y Propinas</DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-4 text-sm">
+                            <p>Al realizar una propina o solicitud musical, aceptas los siguientes términos:</p>
+                            
+                            <div className="space-y-3">
+                              <div className="p-3 bg-muted/50 rounded-lg">
+                                <h4 className="font-semibold text-foreground mb-2">1. 💝 Propinas voluntarias</h4>
+                                <p className="text-muted-foreground">El pago no garantiza reproducción inmediata de una canción, pero será tomada en cuenta con prioridad.</p>
+                              </div>
+                              
+                              <div className="p-3 bg-muted/50 rounded-lg">
+                                <h4 className="font-semibold text-foreground mb-2">2. ⏱️ Duración límite</h4>
+                                <p className="text-muted-foreground">Máximo 5 minutos por pista.</p>
+                              </div>
+                              
+                              <div className="p-3 bg-muted/50 rounded-lg">
+                                <h4 className="font-semibold text-foreground mb-2">3. ✅ Verifica tu solicitud</h4>
+                                <p className="text-muted-foreground">Asegúrate de incluir correctamente artista, título y género.</p>
+                              </div>
+                              
+                              <div className="p-3 bg-muted/50 rounded-lg">
+                                <h4 className="font-semibold text-foreground mb-2">4. 🚫 Sin devoluciones</h4>
+                                <p className="text-muted-foreground">No se ofrecen reembolsos ni cambios una vez que una canción ha sido reproducida.</p>
+                              </div>
+                              
+                              <div className="p-3 bg-muted/50 rounded-lg">
+                                <h4 className="font-semibold text-foreground mb-2">5. 🎵 Contenido</h4>
+                                <p className="text-muted-foreground">No se permiten canciones con lenguaje ofensivo o que no se ajusten al ambiente del evento.</p>
+                              </div>
+                              
+                              <div className="p-3 bg-muted/50 rounded-lg">
+                                <h4 className="font-semibold text-foreground mb-2">6. 🔒 Privacidad</h4>
+                                <p className="text-muted-foreground">Tu información de pago es manejada únicamente por Stripe y no es almacenada por nosotros.</p>
+                              </div>
+                            </div>
+                            
+                            <div className="border-t pt-4 text-center text-xs text-muted-foreground">
+                              Última actualización: Julio 2025
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </Label>
+                  </div>
+                </div>
+
                 {/* Submit Button */}
                 <div className="animate-fade-in" style={{ animationDelay: '2s' }}>
                   <Button 
                     type="submit" 
-                    variant="dj" 
-                    size="xl" 
-                    disabled={isSubmitting}
-                    className="w-full hover:scale-105 transition-all duration-300 disabled:opacity-70 disabled:hover:scale-100"
+                    className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:hover:scale-100"
+                    disabled={isSubmitting || !acceptedTerms || !isRequestTimeAllowed}
                   >
                     {isSubmitting ? (
                       <>
@@ -399,16 +574,50 @@ const Index = () => {
                 </div>
               </form>
 
-              {/* Payment Info */}
-              <div className="mt-8 p-4 bg-muted/30 rounded-lg border border-primary/20">
-                <h3 className="font-semibold text-foreground mb-2">💳 Próximos pasos:</h3>
-                <ol className="text-sm text-muted-foreground space-y-1">
-                  <li>1. Completa el formulario</li>
-                  <li>2. Selecciona método de pago (Cripto/Transferencia)</li>
-                  <li>3. Sube evidencia del pago</li>
-                  <li>4. ¡Espera confirmación cuando tu canción suene!</li>
-                </ol>
-              </div>
+              {/* Payment Section */}
+              {showPayment ? (
+                <div className="mt-8 p-6 bg-gradient-to-br from-muted/40 to-muted/20 rounded-xl border border-primary/30 space-y-6 animate-fade-in">
+                  <h3 className="font-bold text-foreground mb-4 text-center text-xl">💳 Selecciona tu método de pago</h3>
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <Button
+                      onClick={() => handlePayment(localStorage.getItem('currentRequestId') || '', parseFloat(localStorage.getItem('currentTipAmount') || '0'))}
+                      className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 gentle-pulse hover:animate-none"
+                      disabled={parseFloat(localStorage.getItem('currentTipAmount') || '0') < 2}
+                    >
+                      <CreditCard className="w-5 h-5 mr-2" />
+                      💳 Stripe (${localStorage.getItem('currentTipAmount') || '0'} USD)
+                    </Button>
+                    
+                    <Button
+                      onClick={() => window.open('https://buy.stripe.com/cNifZgclA1ve8vS0z02Ji01', '_blank')}
+                      className="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 gentle-pulse hover:animate-none"
+                      style={{ animationDelay: '0.5s' }}
+                      disabled={parseFloat(localStorage.getItem('currentTipAmount') || '0') < 2}
+                    >
+                      <span className="text-lg mr-2">₿</span>
+                      Cripto ({localStorage.getItem('currentTipAmount') || '0'} USDC)
+                    </Button>
+                  </div>
+                  <div className="text-center space-y-2">
+                    <p className="text-xs text-muted-foreground">
+                      Tu solicitud será procesada después de confirmar el pago
+                    </p>
+                    <p className="text-xs text-primary font-medium">
+                      Mínimo: $2 USD / 2 USDC
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-8 p-4 bg-muted/30 rounded-lg border border-primary/20">
+                  <h3 className="font-semibold text-foreground mb-2">💳 Próximos pasos:</h3>
+                  <ol className="text-sm text-muted-foreground space-y-1">
+                    <li>1. Completa el formulario y acepta los términos</li>
+                    <li>2. Selecciona método de pago (Stripe/Cripto)</li>
+                    <li>3. Confirma tu pago</li>
+                    <li>4. ¡Espera confirmación cuando tu canción suene!</li>
+                  </ol>
+                </div>
+              )}
             </CardContent>
           </Card>
 

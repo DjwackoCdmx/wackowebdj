@@ -266,7 +266,7 @@ const Admin = () => {
                     <Input
                       id="email"
                       type="email"
-                      placeholder="djwacko@outlook.es"
+                      placeholder="Ingresa tu email de acceso"
                       value={loginForm.email}
                       onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
                       className="bg-background/50 border-primary/30"
@@ -306,13 +306,13 @@ const Admin = () => {
                 </div>
               </>
             ) : (
-              <form onSubmit={handleResetPassword} className="space-y-4">
+                <form onSubmit={handleResetPassword} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="reset-email">Email de recuperación</Label>
                   <Input
                     id="reset-email"
                     type="email"
-                    placeholder="djwacko@outlook.es"
+                    placeholder="Ingresa tu email para recuperar contraseña"
                     value={resetEmail}
                     onChange={(e) => setResetEmail(e.target.value)}
                     className="bg-background/50 border-primary/30"

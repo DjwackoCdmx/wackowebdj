@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, FileText, Shield, Users, CreditCard } from "lucide-react";
-import djWackoMainLogo from "@/assets/dj-wacko-main-logo.png";
+import djWackoMainLogo from "@/assets/dj-wacko-main-logo.gif";
 
 const Terms = () => {
   const navigate = useNavigate();

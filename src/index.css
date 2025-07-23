@@ -121,3 +121,40 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  /* Underline Animation */
+  .story-link {
+    @apply relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-primary after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left;
+  }
+  
+  /* Hover Scale Animation */
+  .hover-scale {
+    @apply transition-transform duration-200 hover:scale-105;
+  }
+  
+  /* Gentle animations for payment buttons */
+  .gentle-pulse {
+    animation: gentle-pulse 3s ease-in-out infinite;
+  }
+  
+  .smooth-glow {
+    animation: smooth-glow 4s ease-in-out infinite alternate;
+  }
+  
+  @keyframes gentle-pulse {
+    0%, 100% { 
+      opacity: 1; 
+      transform: scale(1);
+    }
+    50% { 
+      opacity: 0.85; 
+      transform: scale(1.01);
+    }
+  }
+  
+  @keyframes smooth-glow {
+    0% { box-shadow: 0 0 10px hsl(var(--primary) / 0.2); }
+    100% { box-shadow: 0 0 20px hsl(var(--primary) / 0.4); }
+  }
+}
