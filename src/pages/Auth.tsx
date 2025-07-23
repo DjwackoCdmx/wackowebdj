@@ -31,6 +31,15 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [activeTab, setActiveTab] = useState<'signin' | 'signup'>('signin');
+  const [shake, setShake] = useState(false);
+
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
 
   useEffect(() => {
     // Check if user is already logged in
@@ -152,10 +161,10 @@ const Auth = () => {
   };
 
   return (
-    <div className="auth-bg min-h-screen flex items-center justify-center p-4">
+    <div className="auth-bg min-h-screen flex items-center justify-center p-2 md:p-4">
       <div className="absolute inset-0 bg-black/20"></div>
       
-      <Card className="w-full max-w-md relative z-10 auth-card-glass auth-card-animate">
+      <Card className={`w-full max-w-md relative z-10 auth-card-glass auth-card-animate ${shake ? 'shake' : ''}`}>
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <img 
@@ -174,8 +183,8 @@ const Auth = () => {
         </CardHeader>
         
         <CardContent>
-          <Tabs defaultValue="signin" className="auth-tabs auth-tabs-animate space-y-4">
-            <TabsList className="grid w-full grid-cols-2 bg-white/10 backdrop-blur">
+          <Tabs defaultValue={activeTab} value={activeTab} onValueChange={(val) => setActiveTab(val as 'signin' | 'signup')} className="w-full auth-tabs auth-tabs-animate space-y-4">
+            <TabsList>
               <TabsTrigger value="signin" className="data-[state=active]:bg-white/20">
                 <LogIn className="w-4 h-4 mr-2" />
                 Iniciar Sesión
@@ -307,7 +316,7 @@ const Auth = () => {
               className="auth-btn-ghost"
               onClick={() => navigate("/")}
             >
-              ← Volver al inicio
+              <Music className="icon-spin mr-2" /> Volver al inicio
             </Button>
           </div>
         </CardContent>
