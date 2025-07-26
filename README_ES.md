@@ -62,7 +62,7 @@ Djwacko_propinas_web_monorepo/
 │   │   ├── assets/
 │   │   │   ├── dj-hero-bg.jpg
 │   │   │   ├── dj-wacko-logo-text.png
-│   │   │   ├── dj-wacko-main-logo.jpg
+│   │   │   ├── dj-wacko-main-logo.gif
 │   │   │   └── images.d.ts
 │   │   ├── index.css
 │   │   ├── Index.tsx

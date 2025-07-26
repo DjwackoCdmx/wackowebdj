@@ -1,22 +1,22 @@
-# Welcome to your Dj Wacko project
+# Bienvenido a tu proyecto DjWacko
 
 ## Project info
 
-**URL**: https://Dj Wacko.dev/projects/aeb9f239-ed37-452c-8ff8-7ad1a37dc321
+**URL**: https://djwacko.com
 
 ## How can I edit this code?
 
 There are several ways of editing your application.
 
-**Use Dj Wacko**
+**Uso DjWacko**
 
-Simply visit the [Dj Wacko Project](https://Dj Wacko.dev/projects/aeb9f239-ed37-452c-8ff8-7ad1a37dc321) and start prompting.
+Visita el [Proyecto DjWacko](https://djwacko.com) y comienza a interactuar.
 
-Changes made via Dj Wacko will be committed automatically to this repo.
+Los cambios realizados se reflejarán automáticamente en este repositorio.
 
 **Use your preferred IDE**
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Dj Wacko.
+Si deseas trabajar localmente usando tu propio IDE, puedes clonar este repositorio y subir tus cambios. Los cambios se verán reflejados en DjWacko.
 
 The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
@@ -62,12 +62,12 @@ This project is built with:
 
 ## How can I deploy this project?
 
-Simply open [Dj Wacko](https://Dj Wacko.dev/projects/aeb9f239-ed37-452c-8ff8-7ad1a37dc321) and click on Share -> Publish.
+Abre [DjWacko](https://djwacko.com) y haz clic en Compartir -> Publicar.
 
-## Can I connect a custom domain to my Dj Wacko project?
+## ¿Puedo conectar un dominio personalizado a mi proyecto DjWacko?
 
 Yes, you can!
 
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
-Read more here: [Setting up a custom domain](https://docs.Dj Wacko.dev/tips-tricks/custom-domain#step-by-step-guide)
+Lee más aquí: [Configuración de dominio personalizado](https://djwacko.com/docs/dominio-personalizado)

@@ -157,6 +157,8 @@ export type Database = {
           email: string
           id: string
           name: string | null
+          nickname: string | null
+          phone: string | null
           updated_at: string
           user_id: string | null
         }
@@ -165,6 +167,8 @@ export type Database = {
           email: string
           id?: string
           name?: string | null
+          nickname?: string | null
+          phone?: string | null
           updated_at?: string
           user_id?: string | null
         }
@@ -173,8 +177,43 @@ export type Database = {
           email?: string
           id?: string
           name?: string | null
+          nickname?: string | null
+          phone?: string | null
           updated_at?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      user_saved_songs: {
+        Row: {
+          artist_name: string
+          created_at: string
+          genre: string | null
+          id: string
+          song_name: string
+          tip_amount: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          artist_name: string
+          created_at?: string
+          genre?: string | null
+          id?: string
+          song_name: string
+          tip_amount?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          artist_name?: string
+          created_at?: string
+          genre?: string | null
+          id?: string
+          song_name?: string
+          tip_amount?: number
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

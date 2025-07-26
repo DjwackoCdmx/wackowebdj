@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -38,9 +38,43 @@ interface UserProfile {
 }
 
 const Admin = () => {
-  // ...estados y hooks...
+  const { toast } = useToast();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [loginForm, setLoginForm] = useState({ email: "", password: "" });
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [requests, setRequests] = useState<SongRequest[]>([]);
+  const [history, setHistory] = useState<SongRequest[]>([]);
+  const [onlineUsers, setOnlineUsers] = useState<UserProfile[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
 
-  // Definir fetchRequests antes de fetchOnlineUsers
+  useEffect(() => {
+    // Check for existing session
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user ?? null);
+      setLoading(false);
+    };
+
+    checkSession();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      fetchRequests();
+      fetchOnlineUsers();
+    }
+  }, [user]);
+
   const fetchRequests = async () => {
     try {
       setRefreshing(true);
@@ -73,21 +107,12 @@ const Admin = () => {
       setRefreshing(false);
     }
   };
-  const { toast } = useToast();
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [loginForm, setLoginForm] = useState({ email: "", password: "" });
-  const [showResetPassword, setShowResetPassword] = useState(false);
-  const [resetEmail, setResetEmail] = useState("");
-  const [requests, setRequests] = useState<SongRequest[]>([]);
-  const [history, setHistory] = useState<SongRequest[]>([]);
-  const [onlineUsers, setOnlineUsers] = useState<UserProfile[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
 
-  // Definir la función después de los hooks y estados
   const fetchOnlineUsers = async () => {
     try {
+      // Get users who have made requests in the last 30 minutes
       const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();
+      
       const { data: recentRequests, error: requestsError } = await supabase
         .from('song_requests')
         .select('user_id')
@@ -97,31 +122,16 @@ const Admin = () => {
       if (requestsError) throw requestsError;
 
       const userIds = [...new Set(recentRequests?.map(r => r.user_id).filter(Boolean))];
-
+      
       if (userIds.length > 0) {
         const { data: profiles, error: profilesError } = await supabase
           .from('user_profiles')
-          .select('id, user_id, name, email, created_at, updated_at, nickname, phone')
+          .select('*')
           .in('user_id', userIds);
 
-        if (profilesError || !Array.isArray(profiles)) {
-          toast({
-            title: "Error",
-            description: "No se pudieron cargar los perfiles de usuario. Verifica las columnas en Supabase.",
-            variant: "destructive"
-          });
-          setOnlineUsers([]);
-          return;
-        }
+        if (profilesError) throw profilesError;
 
-        // Si no hay datos válidos, solo mostrar el toast y setear array vacío
-        toast({
-          title: "Error",
-          description: "No se pudieron cargar los perfiles de usuario. Verifica las columnas en Supabase.",
-          variant: "destructive"
-        });
-        setOnlineUsers([]);
-        return;
+        setOnlineUsers(profiles?.map(p => ({ ...p, is_online: true })) || []);
       } else {
         setOnlineUsers([]);
       }
@@ -146,20 +156,12 @@ const Admin = () => {
         title: "¡Bienvenido DJ Wacko!",
         description: "Acceso concedido al panel de administración"
       });
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        toast({
-          title: "Error de acceso",
-          description: error.message || "Credenciales incorrectas",
-          variant: "destructive"
-        });
-      } else {
-        toast({
-          title: "Error de acceso",
-          description: "Credenciales incorrectas",
-          variant: "destructive"
-        });
-      }
+    } catch (error: any) {
+      toast({
+        title: "Error de acceso",
+        description: error.message || "Credenciales incorrectas",
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
@@ -182,20 +184,12 @@ const Admin = () => {
       });
       setShowResetPassword(false);
       setResetEmail("");
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        toast({
-          title: "Error",
-          description: error.message || "No se pudo enviar el email",
-          variant: "destructive"
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: "No se pudo enviar el email",
-          variant: "destructive"
-        });
-      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "No se pudo enviar el email",
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
