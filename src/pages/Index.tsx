@@ -145,9 +145,9 @@ const Index = () => {
 
   const handlePayment = async (requestId: string, amount: number) => {
     try {
-        const { data, error } = await supabase.functions.invoke('create-stripe-session', {
+        const { data, error } = await supabase.functions.invoke('create-payment', {
             body: { 
-                request_id: requestId,
+                song_request_id: requestId,
                 amount: amount 
             },
         });
