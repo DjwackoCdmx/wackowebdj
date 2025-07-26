@@ -295,8 +295,8 @@ const Index = () => {
           <div className="flex justify-center mb-6 animate-fade-in">
             <img 
               src={djWackoMainLogo} 
-              alt="DJ Wacko" 
-              className="w-48 h-48 object-contain hover-scale transition-transform duration-500"
+              alt="DJ Wacko Logo" 
+              className="w-48 h-48 object-contain"
             />
           </div>
           
