@@ -1,73 +1,57 @@
 # Bienvenido a tu proyecto DjWacko
 
-## Project info
+## Estado del Proyecto
 
-**URL**: https://djwacko.com
+Este proyecto es una aplicación web interactiva que permite a los usuarios solicitar canciones a un DJ y enviar propinas. Cuenta con un panel de administración para el DJ y una interfaz de usuario pulida para los clientes.
 
-## How can I edit this code?
+**Últimas Actualizaciones (Julio 2024):**
 
-There are several ways of editing your application.
+- **Mejora de la Interfaz:** Se eliminaron elementos redundantes y se mejoraron las animaciones para una experiencia de usuario más fluida.
+- **Corrección de Errores:** Se solucionaron errores críticos de compilación relacionados con la generación de tipos de Supabase y dependencias de React Hooks.
+- **Actualización de Título:** El título de la página se ha actualizado a "DjWacko".
 
-**Uso DjWacko**
+## Tecnologías Utilizadas
 
-Visita el [Proyecto DjWacko](https://djwacko.com) y comienza a interactuar.
+Este proyecto está construido con un stack moderno y robusto:
 
-Los cambios realizados se reflejarán automáticamente en este repositorio.
+- **Framework:** React (con Vite)
+- **Lenguaje:** TypeScript
+- **Backend y Base de Datos:** Supabase
+- **UI:** shadcn-ui y Tailwind CSS
+- **Gestor de Paquetes:** pnpm
 
-**Use your preferred IDE**
+## Cómo Empezar
 
-Si deseas trabajar localmente usando tu propio IDE, puedes clonar este repositorio y subir tus cambios. Los cambios se verán reflejados en DjWacko.
+Para trabajar en este proyecto localmente, sigue estos pasos:
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+1. **Clona el repositorio:**
 
-Follow these steps:
+   ```sh
+   git clone https://github.com/DjwackoCdmx/wackowebdj.git
+   ```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+2. **Navega al directorio del proyecto:**
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+   ```sh
+   cd wackowebdj
+   ```
 
-# Step 3: Install the necessary dependencies.
-npm i
+3. **Instala las dependencias:**
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+   (Asegúrate de tener [pnpm](https://pnpm.io/installation) instalado).
 
-**Edit a file directly in GitHub**
+   ```sh
+   pnpm install
+   ```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+4. **Inicia el servidor de desarrollo:**
 
-**Use GitHub Codespaces**
+   ```sh
+   pnpm run dev
+   ```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+La aplicación estará disponible en `http://localhost:8080`.
 
-## What technologies are used for this project?
+## Despliegue
 
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Abre [DjWacko](https://djwacko.com) y haz clic en Compartir -> Publicar.
-
-## ¿Puedo conectar un dominio personalizado a mi proyecto DjWacko?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Lee más aquí: [Configuración de dominio personalizado](https://djwacko.com/docs/dominio-personalizado)
+El proyecto está configurado para ser desplegado fácilmente en plataformas como Vercel, Netlify o directamente usando la CLI de Supabase.
