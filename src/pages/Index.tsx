@@ -141,6 +141,29 @@ const Index = () => {
     });
   };
 
+  const handleCoinbasePayment = async (requestId: string, amount: number) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('create-coinbase-charge', {
+        body: {
+          song_request_id: requestId,
+          amount: amount,
+          currency: 'usd'
+        }
+      });
+
+      if (error) throw error;
+
+      window.open(data.url, '_blank');
+    } catch (error) {
+      console.error('Error creating Coinbase charge:', error);
+      toast({
+        title: "Error en el pago con Cripto",
+        description: "No se pudo procesar el pago. Inténtalo nuevamente.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handlePayment = async (requestId: string, amount: number) => {
     try {
       const { data, error } = await supabase.functions.invoke('create-payment', {
@@ -577,8 +600,8 @@ const Index = () => {
                     </Button>
                     
                     <Button
-                      onClick={() => window.open('https://buy.stripe.com/cNifZgclA1ve8vS0z02Ji01', '_blank')}
-                      className="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 gentle-pulse hover:animate-none"
+                      onClick={() => handleCoinbasePayment(localStorage.getItem('currentRequestId') || '', parseFloat(localStorage.getItem('currentTipAmount') || '0'))}
+                      className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 gentle-pulse hover:animate-none"
                       style={{ animationDelay: '0.5s' }}
                       disabled={parseFloat(localStorage.getItem('currentTipAmount') || '0') < 2}
                     >
