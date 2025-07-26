@@ -8,10 +8,10 @@ const Terms = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-2 md:p-4 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-4">
       <div className="absolute inset-0 bg-black/20"></div>
       
-      <div className="container mx-auto max-w-4xl flex-1 flex flex-col justify-center">
+      <div className="relative z-10 max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <Button
             variant="ghost"
@@ -109,16 +109,21 @@ const Terms = () => {
               </div>
               <div className="text-white/90 leading-relaxed space-y-3">
                 <p>
-                  Nos comprometemos a proteger su privacidad. La información recopilada incluye:
+                  <strong>🔒 Compromiso de Privacidad:</strong> Nos comprometemos a proteger su privacidad y no almacenamos datos sensibles que no sean destinados al uso del servicio.
                 </p>
+                <p>La información recopilada incluye únicamente:</p>
                 <ul className="list-disc pl-6 space-y-1">
-                  <li>Nombre y datos de contacto (opcional)</li>
-                  <li>Información de pago (procesada de forma segura por Stripe)</li>
+                  <li>Nombre, teléfono y apodo (para el servicio de solicitudes)</li>
+                  <li>Email y contraseña (cifrada y segura)</li>
+                  <li>Información de pago (procesada de forma segura por Stripe, no almacenada)</li>
                   <li>Historial de solicitudes de canciones</li>
                   <li>Usuario de Telegram (opcional, para comunicación directa)</li>
                 </ul>
                 <p className="mt-3">
-                  Sus datos nunca serán compartidos con terceros sin su consentimiento explícito.
+                  <strong>Garantía de Seguridad:</strong> Sus datos nunca serán compartidos con terceros sin su consentimiento explícito y solo se utilizan para brindar el servicio de DJ.
+                </p>
+                <p className="bg-blue-500/20 p-3 rounded-lg border border-blue-500/30">
+                  <strong>Requisitos de Contraseña Segura:</strong> Para su protección, las contraseñas deben tener al menos 8 caracteres, incluir una letra mayúscula, un número y un carácter especial.
                 </p>
               </div>
             </section>

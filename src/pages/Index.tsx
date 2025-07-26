@@ -386,7 +386,6 @@ const Index = () => {
               </ol>
             </div>
           )}
-          </div>
         </div>
       </div>
       <div className="text-center mt-8">

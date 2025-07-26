@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Music, Play, Square, Trash2, Clock, DollarSign, MessageSquare, CheckCircle2, X, RefreshCw } from "lucide-react";
+import { Music, Play, Square, Trash2, Clock, DollarSign, MessageSquare, CheckCircle2, X, RefreshCw, User as UserIcon, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
@@ -22,6 +22,19 @@ interface SongRequest {
   payment_status: string;
   played_status: string;
   played_at?: string;
+  user_id?: string;
+}
+
+interface UserProfile {
+  id: string;
+  user_id: string;
+  name: string;
+  email: string;
+  nickname: string;
+  phone: string;
+  created_at: string;
+  updated_at: string;
+  is_online?: boolean;
 }
 
 const Admin = () => {
@@ -33,6 +46,7 @@ const Admin = () => {
   const [resetEmail, setResetEmail] = useState("");
   const [requests, setRequests] = useState<SongRequest[]>([]);
   const [history, setHistory] = useState<SongRequest[]>([]);
+  const [onlineUsers, setOnlineUsers] = useState<UserProfile[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
@@ -57,6 +71,7 @@ const Admin = () => {
   useEffect(() => {
     if (user) {
       fetchRequests();
+      fetchOnlineUsers();
     }
   }, [user]);
 
@@ -66,14 +81,14 @@ const Admin = () => {
       const { data: pendingRequests, error: pendingError } = await supabase
         .from('song_requests')
         .select('*')
-        .eq('played_status', 'pending')
+        .in('played_status', ['pending', 'playing'])
         .order('tip_amount', { ascending: false })
         .order('created_at', { ascending: true });
 
       const { data: playedRequests, error: playedError } = await supabase
         .from('song_requests')
         .select('*')
-        .in('played_status', ['playing', 'completed'])
+        .eq('played_status', 'completed')
         .order('played_at', { ascending: false });
 
       if (pendingError) throw pendingError;
@@ -90,6 +105,38 @@ const Admin = () => {
       });
     } finally {
       setRefreshing(false);
+    }
+  };
+
+  const fetchOnlineUsers = async () => {
+    try {
+      // Get users who have made requests in the last 30 minutes
+      const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();
+      
+      const { data: recentRequests, error: requestsError } = await supabase
+        .from('song_requests')
+        .select('user_id')
+        .gte('created_at', thirtyMinutesAgo)
+        .not('user_id', 'is', null);
+
+      if (requestsError) throw requestsError;
+
+      const userIds = [...new Set(recentRequests?.map(r => r.user_id).filter(Boolean))];
+      
+      if (userIds.length > 0) {
+        const { data: profiles, error: profilesError } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .in('user_id', userIds);
+
+        if (profilesError) throw profilesError;
+
+        setOnlineUsers(profiles?.map(p => ({ ...p, is_online: true })) || []);
+      } else {
+        setOnlineUsers([]);
+      }
+    } catch (error) {
+      console.error('Error fetching online users:', error);
     }
   };
 
@@ -250,72 +297,27 @@ const Admin = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
-        <div className="container mx-auto px-2 md:px-6 py-6 flex-1 flex flex-col">
-          <Card className="w-full max-w-md bg-card/80 backdrop-blur-sm border-primary/20">
-            <CardHeader className="text-center">
-              <Music className="w-12 h-12 text-primary mx-auto mb-4" />
-              <CardTitle className="text-2xl font-bold"> DJ Admin Panel</CardTitle>
-              <CardDescription>Acceso exclusivo para DJ Wacko</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {!showResetPassword ? (
-                <div>
-                  <form onSubmit={handleLogin} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="Ingresa tu email de acceso"
-                        value={loginForm.email}
-                        onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
-                        className="bg-background/50 border-primary/30"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="password">Contraseña</Label>
-                      <Input
-                        id="password"
-                        type="password"
-                        value={loginForm.password}
-                        onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-                        className="bg-background/50 border-primary/30"
-                        required
-                      />
-                    </div>
-                    <Button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700" disabled={loading}>
-                      {loading ? (
-                        <>
-                          <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                          Iniciando...
-                        </>
-                      ) : (
-                        "Iniciar Sesión"
-                      )}
-                    </Button>
-                  </form>
-                  <div className="mt-4 text-center">
-                    <Button 
-                      variant="link" 
-                      onClick={() => setShowResetPassword(true)}
-                      className="text-primary"
-                    >
-                      ¿Olvidaste tu contraseña?
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <form onSubmit={handleResetPassword} className="space-y-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-card/80 backdrop-blur-sm border-primary/20">
+          <CardHeader className="text-center">
+            <Music className="w-12 h-12 text-primary mx-auto mb-4" />
+            <CardTitle className="text-2xl font-bold">🎧 DJ Admin Panel</CardTitle>
+            <CardDescription>Acceso exclusivo para DJ Wacko</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {!showResetPassword ? (
+              <>
+                <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="reset-email">Email de recuperación</Label>
+                    <Label htmlFor="email">Email</Label>
                     <Input
-                      id="reset-email"
+                      id="email"
                       type="email"
-                      placeholder="Ingresa tu email para recuperar contraseña"
-                      value={resetEmail}
-                      onChange={(e) => setResetEmail(e.target.value)}
+                      placeholder="Ingresa tu email de acceso"
+                      value={loginForm.email}
+                      onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
+                      className="bg-background/50 border-primary/30"
+                      required
                     />
                   </div>
                   <div className="space-y-2">
@@ -402,7 +404,10 @@ const Admin = () => {
           <div className="flex gap-2">
             <Button 
               variant="outline" 
-              onClick={fetchRequests}
+              onClick={() => {
+                fetchRequests();
+                fetchOnlineUsers();
+              }}
               disabled={refreshing}
             >
               {refreshing ? (
@@ -421,12 +426,15 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="queue" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-8">
+          <TabsList className="grid w-full grid-cols-3 mb-8">
             <TabsTrigger value="queue" className="text-lg">
-              🎵 Cola de Solicitudes ({requests.length})
+              🎵 Cola ({requests.length})
             </TabsTrigger>
             <TabsTrigger value="history" className="text-lg">
               📋 Historial ({history.length})
+            </TabsTrigger>
+            <TabsTrigger value="users" className="text-lg">
+              👥 Usuarios ({onlineUsers.length})
             </TabsTrigger>
           </TabsList>
 
@@ -492,14 +500,25 @@ const Admin = () => {
                       </div>
                       
                       <div className="flex items-center gap-2">
-                        <Button
-                          className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
-                          size="lg"
-                          onClick={() => handlePlay(request.id)}
-                        >
-                          <Play className="w-5 h-5 mr-2" />
-                          Reproducir
-                        </Button>
+                        {request.played_status === "pending" ? (
+                          <Button
+                            className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
+                            size="lg"
+                            onClick={() => handlePlay(request.id)}
+                          >
+                            <Play className="w-5 h-5 mr-2" />
+                            Reproducir
+                          </Button>
+                        ) : (
+                          <Button
+                            className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white animate-pulse"
+                            size="lg"
+                            onClick={() => handleFinish(request.id)}
+                          >
+                            <Square className="w-5 h-5 mr-2" />
+                            Detener
+                          </Button>
+                        )}
                         <Button
                           variant="destructive"
                           size="lg"
@@ -536,11 +555,11 @@ const Admin = () => {
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <Badge 
-                            variant={item.played_status === "playing" ? "default" : "secondary"}
-                            className={item.played_status === "playing" ? "bg-gradient-electric text-white animate-pulse" : ""}
+                         <Badge 
+                            variant="secondary"
+                            className="bg-green-500/20 text-green-400 border-green-500/30"
                           >
-                            {item.played_status === "playing" ? "🔊 Reproduciendo" : "✅ Completada"}
+                            ✅ Completada
                           </Badge>
                           <Badge variant="outline">
                             ${item.tip_amount.toFixed(2)} USD
@@ -588,16 +607,6 @@ const Admin = () => {
                       </div>
                       
                       <div className="flex items-center gap-2">
-                        {item.played_status === "playing" && (
-                          <Button
-                            className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white"
-                            size="lg"
-                            onClick={() => handleFinish(item.id)}
-                          >
-                            <Square className="w-5 h-5 mr-2" />
-                            Finalizar
-                          </Button>
-                        )}
                         <Button
                           variant="outline"
                           size="lg"
@@ -605,6 +614,66 @@ const Admin = () => {
                         >
                           <X className="w-5 h-5" />
                         </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </TabsContent>
+
+          {/* Users Tab */}
+          <TabsContent value="users" className="space-y-4">
+            {onlineUsers.length === 0 ? (
+              <Card className="bg-card/50 border-muted">
+                <CardContent className="text-center py-12">
+                  <UserIcon className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-muted-foreground">
+                    No hay usuarios activos
+                  </h3>
+                  <p className="text-muted-foreground">
+                    Los usuarios que hagan solicitudes aparecerán aquí
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              onlineUsers.map((userProfile) => (
+                <Card key={userProfile.id} className="bg-card/80 border-primary/20">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <Badge className="bg-green-500 text-white">
+                            🟢 En línea
+                          </Badge>
+                          <Badge variant="outline">
+                            Usuario registrado
+                          </Badge>
+                        </div>
+                        
+                        <h3 className="text-xl font-bold text-foreground">
+                          {userProfile.name} ({userProfile.nickname})
+                        </h3>
+                        <p className="text-lg text-muted-foreground">
+                          {userProfile.email}
+                        </p>
+                        
+                        <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-1">
+                            <Phone className="w-4 h-4" />
+                            {userProfile.phone}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Clock className="w-4 h-4" />
+                            Registrado: {new Date(userProfile.created_at).toLocaleDateString()}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-2">
+                        <Badge className="bg-blue-500 text-white">
+                          ID: {userProfile.user_id.slice(0, 8)}...
+                        </Badge>
                       </div>
                     </div>
                   </CardContent>

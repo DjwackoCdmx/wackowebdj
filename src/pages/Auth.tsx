@@ -1,62 +1,161 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { User, Mail, Lock, UserPlus, LogIn, Music } from "lucide-react";
+import { Eye, EyeOff, Music, User, Mail, Phone, UserPlus, Shield, Trash2, AlertTriangle } from "lucide-react";
 import djWackoMainLogo from "@/assets/dj-wacko-main-logo.gif";
-
-// Utilidad para obtener mensaje seguro de error
-function getErrorMessage(error: unknown): string {
-  if (typeof error === "string") return error;
-  if (
-    error &&
-    typeof error === "object" &&
-    "message" in error &&
-    typeof (error as { message?: unknown }).message === "string"
-  ) {
-    return (error as { message: string }).message;
-  }
-  return "Error desconocido";
-}
+import djWackoLogoText from "@/assets/dj-wacko-logo-text.png";
+import djHeroBg from "@/assets/dj-hero-bg.jpg";
 
 const Auth = () => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const [activeTab, setActiveTab] = useState<'signin' | 'signup'>('signin');
-  const [shake, setShake] = useState(false);
+  const [phone, setPhone] = useState("");
+  const [nickname, setNickname] = useState("");
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     // Check if user is already logged in
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        navigate("/");
+        setCurrentUser(session.user);
+        if (!showDeleteAccount) {
+          navigate("/");
+        }
       }
     };
     checkAuth();
-  }, [navigate]);
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setCurrentUser(session?.user ?? null);
+      if (session && !showDeleteAccount) {
+        navigate("/");
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate, showDeleteAccount]);
+
+  const validatePassword = (password: string) => {
+    const errors: string[] = [];
+    
+    if (password.length < 8) {
+      errors.push("Mínimo 8 caracteres");
+    }
+    if (!/[A-Z]/.test(password)) {
+      errors.push("Al menos una letra mayúscula");
+    }
+    if (!/[0-9]/.test(password)) {
+      errors.push("Al menos un número");
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      errors.push("Al menos un carácter especial");
+    }
+    
+    setPasswordErrors(errors);
+    return errors.length === 0;
+  };
+
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // Clean up any existing auth state
+      const cleanupAuthState = () => {
+        Object.keys(localStorage).forEach((key) => {
+          if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+            localStorage.removeItem(key);
+          }
+        });
+      };
+
+      cleanupAuthState();
+      
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (err) {
+        // Continue even if this fails
+      }
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      if (data.user) {
+        toast({
+          title: "¡Bienvenido de vuelta!",
+          description: "Has iniciado sesión correctamente.",
+        });
+        
+        // Force page reload for clean state
+        window.location.href = '/';
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error al iniciar sesión",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    
+    if (!acceptTerms) {
+      toast({
+        title: "Términos requeridos",
+        description: "Debes aceptar los términos de uso para continuar.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      toast({
+        title: "Contraseña no válida",
+        description: "La contraseña no cumple con los requisitos de seguridad.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const redirectUrl = `${window.location.origin}/`;
+      
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/`,
+          emailRedirectTo: redirectUrl,
           data: {
-            name: name,
+            name,
+            phone,
+            nickname,
           }
         }
       });
@@ -65,255 +164,359 @@ const Auth = () => {
 
       toast({
         title: "¡Registro exitoso!",
-        description: "Por favor verifica tu email para completar el registro.",
+        description: "Revisa tu email para confirmar tu cuenta.",
       });
-      
+
+      setIsLogin(true);
       setEmail("");
       setPassword("");
       setName("");
-    } catch (error: unknown) {
-      let message = "Error desconocido";
-      if (error && typeof error === "object" && "message" in error && typeof (error as { message?: unknown }).message === "string") {
-        message = (error as { message: string }).message;
-      }
+      setPhone("");
+      setNickname("");
+      setAcceptTerms(false);
+      setPasswordErrors([]);
+    } catch (error: any) {
       toast({
         title: "Error en el registro",
-        description: getErrorMessage(error),
+        description: error.message,
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
+  const handleDeleteAccount = async () => {
+    setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({
+          title: "Error",
+          description: "Debes estar autenticado para eliminar tu cuenta.",
+          variant: "destructive",
+        });
+        return;
+      }
 
-      if (error) throw error;
-
-      toast({
-        title: "¡Bienvenido de vuelta!",
-        description: "Has iniciado sesión correctamente.",
-      });
+      // Delete user's saved songs first
+      await supabase.from('user_saved_songs').delete().eq('user_id', session.user.id);
       
-      navigate("/");
-    } catch (error: unknown) {
-      let message = "Error desconocido";
-      if (error && typeof error === "object" && "message" in error && typeof (error as { message?: unknown }).message === "string") {
-        message = (error as { message: string }).message;
-      }
+      // Delete user profile
+      await supabase.from('user_profiles').delete().eq('user_id', session.user.id);
+      
+      // Sign out and clean up
+      await supabase.auth.signOut({ scope: 'global' });
+      
+      // Clean up local storage
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+          localStorage.removeItem(key);
+        }
+      });
+
       toast({
-        title: "Error al iniciar sesión",
-        description: getErrorMessage(error),
+        title: "Cuenta eliminada",
+        description: "Tu cuenta y todos tus datos han sido eliminados permanentemente.",
+      });
+
+      // Force redirect to home page
+      window.location.href = "/";
+    } catch (error: any) {
+      toast({
+        title: "Error al eliminar cuenta",
+        description: error.message,
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setLoading(false);
+      setShowDeleteAccount(false);
     }
   };
 
-  const handleResetPassword = async () => {
-    if (!email) {
-      toast({
-        title: "Email requerido",
-        description: "Por favor ingresa tu email para recuperar la contraseña.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth`,
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Email enviado",
-        description: "Revisa tu email para las instrucciones de recuperación.",
-      });
-    } catch (error: unknown) {
-      let message = "Error desconocido";
-      if (error && typeof error === "object" && "message" in error && typeof (error as { message?: unknown }).message === "string") {
-        message = (error as { message: string }).message;
-      }
-      toast({
-        title: "Error",
-        description: getErrorMessage(error),
-        variant: "destructive",
-      });
-    }
-  };
+  // If user wants to delete account, show delete interface even if logged in
+  if (showDeleteAccount && currentUser) {
+    return (
+      <div 
+        className="min-h-screen bg-gradient-to-br from-primary/20 via-background to-secondary/20 p-4 relative"
+        style={{
+          backgroundImage: `url(${djHeroBg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        <div className="absolute inset-0 bg-black/60"></div>
+        
+        <div className="relative z-10 flex items-center justify-center min-h-screen">
+          <Card className="backdrop-blur-sm bg-card/90 max-w-md w-full animate-scale-in">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-red-400" />
+                Confirmar eliminación de cuenta
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-white/90">
+                ⚠️ <strong>Advertencia:</strong> Al eliminar tu cuenta se perderán todos tus datos, 
+                historial de canciones, favoritos y tendrás que hacer un nuevo registro.
+              </p>
+              <p className="text-white/90">
+                Esta acción es <strong>irreversible</strong>. ¿Estás seguro?
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => setShowDeleteAccount(false)}
+                  variant="outline"
+                  className="flex-1 border-white/20 text-white hover:bg-white/10"
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  onClick={handleDeleteAccount}
+                  disabled={loading}
+                  variant="destructive"
+                  className="flex-1 bg-red-600 hover:bg-red-700"
+                >
+                  {loading ? "Eliminando..." : "Eliminar cuenta"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="auth-bg min-h-screen flex items-center justify-center p-2 md:p-4">
-      <div className="absolute inset-0 bg-black/20"></div>
+    <div 
+      className="min-h-screen bg-gradient-to-br from-primary/20 via-background to-secondary/20 p-4 relative"
+      style={{
+        backgroundImage: `url(${djHeroBg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+    >
+      <div className="absolute inset-0 bg-black/60"></div>
       
-      <Card className={`w-full max-w-md relative z-10 auth-card-glass auth-card-animate ${shake ? 'shake' : ''}`}>
-        <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
+      <div className="relative z-10 flex items-center justify-center min-h-screen">
+        <div className="w-full max-w-md space-y-6">
+          {/* Logo and Header */}
+          <div className="text-center space-y-4 animate-fade-in">
             <img 
               src={djWackoMainLogo} 
               alt="DJ Wacko Logo" 
-              className="w-20 h-20 object-contain"
+              className="w-20 h-20 mx-auto hover:scale-110 transition-transform duration-300"
             />
+            <img 
+              src={djWackoLogoText} 
+              alt="DJ Wacko" 
+              className="h-12 mx-auto"
+            />
+            <div>
+              <h1 className="text-3xl font-bold text-white mb-2">
+                {isLogin ? "¡Bienvenido de vuelta!" : "Únete a la experiencia"}
+              </h1>
+              <p className="text-white/80">
+                {isLogin ? "Inicia sesión para continuar" : "Crea tu cuenta y personaliza tus solicitudes"}
+              </p>
+            </div>
           </div>
-          <CardTitle className="text-2xl font-bold text-white flex items-center justify-center gap-2">
-            <Music className="w-6 h-6" />
-            DJ Wacko
-          </CardTitle>
-          <CardDescription className="text-white/80">
-            Únete a la comunidad musical más exclusiva
-          </CardDescription>
-        </CardHeader>
-        
-        <CardContent>
-          <Tabs defaultValue={activeTab} value={activeTab} onValueChange={(val) => setActiveTab(val as 'signin' | 'signup')} className="w-full auth-tabs auth-tabs-animate space-y-4">
-            <TabsList>
-              <TabsTrigger value="signin" className="data-[state=active]:bg-white/20">
-                <LogIn className="w-4 h-4 mr-2" />
-                Iniciar Sesión
-              </TabsTrigger>
-              <TabsTrigger value="signup" className="data-[state=active]:bg-white/20">
-                <UserPlus className="w-4 h-4 mr-2" />
-                Registrarse
-              </TabsTrigger>
-            </TabsList>
 
-            <TabsContent value="signin" className="auth-tabs-animate space-y-4">
-              <form onSubmit={handleSignIn} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="signin-email" className="text-white">Email</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-white/60" />
+          {/* Auth Form */}
+          <Card className="backdrop-blur-sm bg-card/90 animate-scale-in">
+            <CardContent className="p-6">
+              <form onSubmit={isLogin ? handleSignIn : handleSignUp} className="space-y-4">
+                {!isLogin && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="name" className="text-white">
+                        <User className="w-4 h-4 inline mr-1" />
+                        Nombre
+                      </Label>
+                      <Input
+                        id="name"
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
+                        className="bg-white/5 border-white/20 text-white placeholder:text-white/50"
+                        placeholder="Tu nombre"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="nickname" className="text-white">
+                        <Music className="w-4 h-4 inline mr-1" />
+                        Apodo
+                      </Label>
+                      <Input
+                        id="nickname"
+                        type="text"
+                        value={nickname}
+                        onChange={(e) => setNickname(e.target.value)}
+                        required
+                        className="bg-white/5 border-white/20 text-white placeholder:text-white/50"
+                        placeholder="Tu apodo"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {!isLogin && (
+                  <div className="space-y-2">
+                    <Label htmlFor="phone" className="text-white">
+                      <Phone className="w-4 h-4 inline mr-1" />
+                      Teléfono (para notificaciones)
+                    </Label>
                     <Input
-                      id="signin-email"
-                      type="email"
-                      placeholder="tu@email.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="auth-input pl-10"
+                      id="phone"
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
                       required
+                      className="bg-white/5 border-white/20 text-white placeholder:text-white/50"
+                      placeholder="+52 123 456 7890"
                     />
                   </div>
-                </div>
-                
+                )}
+
                 <div className="space-y-2">
-                  <Label htmlFor="signin-password" className="text-white">Contraseña</Label>
+                  <Label htmlFor="email" className="text-white">
+                    <Mail className="w-4 h-4 inline mr-1" />
+                    Email
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="bg-white/5 border-white/20 text-white placeholder:text-white/50"
+                    placeholder="tu@email.com"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-white">
+                    <Shield className="w-4 h-4 inline mr-1" />
+                    Contraseña
+                  </Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-white/60" />
                     <Input
-                      id="signin-password"
-                      type="password"
-                      placeholder="••••••••"
+                      id="password"
+                      type={showPassword ? "text" : "password"}
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="auth-input pl-10"
+                      onChange={(e) => {
+                        setPassword(e.target.value);
+                        if (!isLogin) validatePassword(e.target.value);
+                      }}
                       required
+                      className="bg-white/5 border-white/20 text-white placeholder:text-white/50 pr-10"
+                      placeholder="Tu contraseña"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-white/60 hover:text-white"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
                   </div>
+                  
+                  {!isLogin && passwordErrors.length > 0 && (
+                    <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+                      <p className="text-red-400 font-medium text-sm mb-2">Requisitos de contraseña:</p>
+                      {passwordErrors.map((error, index) => (
+                        <p key={index} className="text-red-300 text-xs">• {error}</p>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {!isLogin && (
+                    <p className="text-white/60 text-xs">
+                      Debe tener al menos 8 caracteres, una mayúscula, un número y un carácter especial
+                    </p>
+                  )}
                 </div>
+
+                {!isLogin && (
+                  <div className="flex items-start space-x-2 bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+                    <Checkbox
+                      id="terms"
+                      checked={acceptTerms}
+                      onCheckedChange={(checked) => setAcceptTerms(checked === true)}
+                      className="border-white/20 data-[state=checked]:bg-primary"
+                    />
+                    <label htmlFor="terms" className="text-sm text-white/90 leading-relaxed">
+                      Acepto los{" "}
+                      <Link to="/terms" className="text-primary hover:underline font-medium">
+                        términos de uso y condiciones
+                      </Link>
+                      {" "}incluyendo que no se almacenan datos sensibles fuera del uso del servicio.
+                    </label>
+                  </div>
+                )}
 
                 <Button
                   type="submit"
-                  className="auth-btn-main w-full"
-                  disabled={isLoading}
+                  disabled={loading || (!isLogin && (!acceptTerms || passwordErrors.length > 0))}
+                  className="w-full bg-gradient-to-r from-primary to-secondary hover:scale-105 transition-all text-white font-bold py-3 disabled:opacity-50"
                 >
-                  {isLoading ? "Iniciando..." : "Iniciar Sesión"}
+                  {loading ? (
+                    "Cargando..."
+                  ) : (
+                    <>
+                      {isLogin ? <Music className="w-4 h-4 mr-2" /> : <UserPlus className="w-4 h-4 mr-2" />}
+                      {isLogin ? "Iniciar Sesión" : "Registrarse"}
+                    </>
+                  )}
                 </Button>
 
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="auth-btn-ghost w-full"
-                  onClick={handleResetPassword}
-                >
-                  ¿Olvidaste tu contraseña?
-                </Button>
+                <p className="text-center text-white/60 mt-4">
+                  {isLogin ? "¿No tienes cuenta?" : "¿Ya tienes cuenta?"}{" "}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsLogin(!isLogin);
+                      setPasswordErrors([]);
+                      setAcceptTerms(false);
+                      setPassword("");
+                    }}
+                    className="text-primary hover:underline font-medium"
+                  >
+                    {isLogin ? "Regístrate aquí" : "Inicia sesión"}
+                  </button>
+                </p>
+
+                {currentUser && (
+                  <div className="mt-6 pt-4 border-t border-white/10">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() => setShowDeleteAccount(true)}
+                      className="w-full text-red-400 hover:bg-red-500/10 hover:text-red-300"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Eliminar cuenta
+                    </Button>
+                  </div>
+                )}
               </form>
-            </TabsContent>
+            </CardContent>
+          </Card>
 
-            <TabsContent value="signup" className="auth-tabs-animate space-y-4">
-              <form onSubmit={handleSignUp} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="signup-name" className="text-white">Nombre</Label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-3 h-4 w-4 text-white/60" />
-                    <Input
-                      id="signup-name"
-                      type="text"
-                      placeholder="Tu nombre"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="auth-input pl-10"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="signup-email" className="text-white">Email</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-white/60" />
-                    <Input
-                      id="signup-email"
-                      type="email"
-                      placeholder="tu@email.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="auth-input pl-10"
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="signup-password" className="text-white">Contraseña</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-white/60" />
-                    <Input
-                      id="signup-password"
-                      type="password"
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="auth-input pl-10"
-                      required
-                      minLength={6}
-                    />
-                  </div>
-                </div>
-
-                <Button
-                  type="submit"
-                  className="auth-btn-main w-full"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Registrando..." : "Crear Cuenta"}
-                </Button>
-              </form>
-            </TabsContent>
-          </Tabs>
-
-          <div className="mt-6 text-center">
+          {/* Back to home button */}
+          <div className="text-center animate-fade-in">
             <Button
               variant="ghost"
-              className="auth-btn-ghost"
               onClick={() => navigate("/")}
+              className="text-white/80 hover:text-white hover:bg-white/10"
             >
-              <Music className="icon-spin mr-2" /> Volver al inicio
+              ← Volver al inicio
             </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 };

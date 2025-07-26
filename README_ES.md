@@ -120,6 +120,32 @@ npm run dev
 npm run build
 ```
 
+---
+
+## Checklist de funcionalidades implementadas (julio 2025)
+
+- [x] Validación de contraseñas seguras (8+ caracteres, mayúscula, número, carácter especial)
+- [x] Términos de uso obligatorios con enlace a página de términos
+- [x] Opción de eliminar cuenta con advertencia clara y limpieza total de datos
+- [x] Limpieza completa del estado de autenticación
+- [x] Políticas de privacidad actualizadas y requisitos de contraseña segura
+- [x] Información sobre no almacenar datos sensibles fuera del servicio
+- [x] Panel de administración mejorado con pestaña "Usuarios" y usuarios en línea (últimos 30 min)
+- [x] Información completa del usuario (nombre, email, teléfono, apodo)
+- [x] Detección de usuarios activos
+- [x] Historial y favoritos funcionales, con reordenamiento desde historial
+- [x] Eliminación de cuenta con confirmación y limpieza total
+- [x] Autenticación actualizada con campos adicionales (nombre, teléfono, apodo) y animaciones sutiles
+- [x] Página de historial con dos pestañas: "Mi Historial" y "Mis Favoritos"
+- [x] Guardar/eliminar canciones y reordenar desde historial
+- [x] Integración con pagos (Stripe y cripto) con validación de mínimo $2 USD/2 USDC
+- [x] Botones de pago animados: gradientes, hover, escala, sombra, pulse
+- [x] Modal de términos elegante y animado, aceptación obligatoria
+- [x] Email oculto en admin
+- [x] Géneros expandidos y opción "Otros" con campo personalizable
+- [x] Imágenes y assets verificados, sin enlaces rotos
+```
+
 Puedes editar archivos en tu IDE favorito o directamente en GitHub. El despliegue puede hacerse en Vercel, Firebase, etc.
 
 ---
