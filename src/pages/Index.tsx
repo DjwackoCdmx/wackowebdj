@@ -316,7 +316,7 @@ const Index = () => {
               href="https://wa.me/5256441274646" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-2 bg-green-600/20 text-green-400 rounded-lg hover:bg-green-600/30 transition-all duration-300 hover-scale"
+              className="flex items-center gap-2 px-4 py-2 bg-green-600/20 text-green-400 rounded-lg"
             >
               📱 +52 56 4412 7464
             </a>
@@ -324,7 +324,7 @@ const Index = () => {
               href="https://twitter.com/DjwackoCDMX" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600/20 text-blue-400 rounded-lg hover:bg-blue-600/30 transition-all duration-300 hover-scale"
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600/20 text-blue-400 rounded-lg"
             >
               🐦 @DjwackoCDMX
             </a>
@@ -401,7 +401,7 @@ const Index = () => {
         <img 
           src={djWackoLogoText} 
           alt="DJ Wacko Logo" 
-          className="mx-auto w-64 h-auto object-contain opacity-60 hover:opacity-100 transition-all duration-500 hover-scale"
+          className="mx-auto w-64 h-auto object-contain"
         />
       </div>
     </div>
