@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import type { User } from "@supabase/supabase-js";
+// Eliminado duplicado de import User
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -7,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, EyeOff, Music, User, Mail, Phone, UserPlus, Shield, Trash2, AlertTriangle } from "lucide-react";
+import { Eye, EyeOff, Music, User as UserIcon, Mail, Phone, UserPlus, Shield, Trash2, AlertTriangle } from "lucide-react";
 import djWackoMainLogo from "@/assets/dj-wacko-main-logo.gif";
 import djWackoLogoText from "@/assets/dj-wacko-logo-text.png";
 import djHeroBg from "@/assets/dj-hero-bg.jpg";
@@ -18,13 +20,13 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [nickname, setNickname] = useState("");
+  const [name, setName] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [showDeleteAccount, setShowDeleteAccount] = useState(false);
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
-  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -72,48 +74,36 @@ const Auth = () => {
     return errors.length === 0;
   };
 
+  // --- FUNCIONES PRINCIPALES LIMPIAS ---
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     try {
-      // Clean up any existing auth state
-      const cleanupAuthState = () => {
-        Object.keys(localStorage).forEach((key) => {
-          if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
-            localStorage.removeItem(key);
-          }
-        });
-      };
-
-      cleanupAuthState();
-      
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+          localStorage.removeItem(key);
+        }
+      });
       try {
         await supabase.auth.signOut({ scope: 'global' });
       } catch (err) {
-        // Continue even if this fails
+        // Ignorar error de signOut
       }
-
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-
       if (data.user) {
         toast({
           title: "¡Bienvenido de vuelta!",
           description: "Has iniciado sesión correctamente.",
         });
-        
-        // Force page reload for clean state
         window.location.href = '/';
       }
-    } catch (error: any) {
+    } catch (error) {
+      let errMsg = "Error desconocido";
+      if (error instanceof Error) errMsg = error.message;
       toast({
         title: "Error al iniciar sesión",
-        description: error.message,
+        description: errMsg,
         variant: "destructive",
       });
     } finally {
@@ -123,7 +113,6 @@ const Auth = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!acceptTerms) {
       toast({
         title: "Términos requeridos",
@@ -132,7 +121,6 @@ const Auth = () => {
       });
       return;
     }
-
     if (!validatePassword(password)) {
       toast({
         title: "Contraseña no válida",
@@ -141,12 +129,9 @@ const Auth = () => {
       });
       return;
     }
-
     setLoading(true);
-
     try {
       const redirectUrl = `${window.location.origin}/`;
-      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -156,29 +141,27 @@ const Auth = () => {
             name,
             phone,
             nickname,
-          }
-        }
+          },
+        },
       });
-
       if (error) throw error;
-
       toast({
         title: "¡Registro exitoso!",
         description: "Revisa tu email para confirmar tu cuenta.",
       });
-
       setIsLogin(true);
       setEmail("");
       setPassword("");
       setName("");
       setPhone("");
-      setNickname("");
       setAcceptTerms(false);
       setPasswordErrors([]);
-    } catch (error: any) {
+    } catch (error) {
+      let errMsg = "Error desconocido";
+      if (error instanceof Error) errMsg = error.message;
       toast({
         title: "Error en el registro",
-        description: error.message,
+        description: errMsg,
         variant: "destructive",
       });
     } finally {
@@ -198,34 +181,25 @@ const Auth = () => {
         });
         return;
       }
-
-      // Delete user's saved songs first
-      await supabase.from('user_saved_songs').delete().eq('user_id', session.user.id);
-      
-      // Delete user profile
+      await (supabase as any).from('user_saved_songs').delete().eq('user_id', session.user.id);
       await supabase.from('user_profiles').delete().eq('user_id', session.user.id);
-      
-      // Sign out and clean up
       await supabase.auth.signOut({ scope: 'global' });
-      
-      // Clean up local storage
       Object.keys(localStorage).forEach((key) => {
         if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
           localStorage.removeItem(key);
         }
       });
-
       toast({
         title: "Cuenta eliminada",
         description: "Tu cuenta y todos tus datos han sido eliminados permanentemente.",
       });
-
-      // Force redirect to home page
       window.location.href = "/";
-    } catch (error: any) {
+    } catch (error) {
+      let errMsg = "Error desconocido";
+      if (error instanceof Error) errMsg = error.message;
       toast({
         title: "Error al eliminar cuenta",
-        description: error.message,
+        description: errMsg,
         variant: "destructive",
       });
     } finally {
@@ -330,7 +304,7 @@ const Auth = () => {
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-2">
                       <Label htmlFor="name" className="text-white">
-                        <User className="w-4 h-4 inline mr-1" />
+                        <UserIcon className="w-4 h-4 inline mr-1" />
                         Nombre
                       </Label>
                       <Input
