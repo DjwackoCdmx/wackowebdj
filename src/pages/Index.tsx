@@ -98,33 +98,28 @@ const Index = () => {
   }, [toast, setSearchParams]);
 
   useEffect(() => {
-    const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user || null);
-      if (session?.user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', session.user.id)
-          .single();
-        setUserRole(profile?.role || null);
-      }
-    };
-    getSession();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setUser(session?.user || null);
-      if (session?.user) {
+    return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      if (user) {
         const { data: profile } = await supabase
           .from('profiles')
           .select('role')
-          .eq('id', session.user.id)
+          .eq('id', user.id)
           .single();
         setUserRole(profile?.role || null);
       } else {
         setUserRole(null);
       }
-    });
+    };
+
+    fetchUserRole();
 
     const reorderData = localStorage.getItem('reorderData');
     if (reorderData) {
@@ -145,9 +140,7 @@ const Index = () => {
       toast({ title: "Pago cancelado", description: "El pago fue cancelado. Puedes intentar nuevamente.", variant: "destructive" });
       setSearchParams({}, { replace: true });
     }
-
-    return () => subscription.unsubscribe();
-  }, [checkRequestTimeAllowed, verifyPayment, searchParams, setSearchParams, toast]);
+  }, [user, checkRequestTimeAllowed, verifyPayment, searchParams, setSearchParams, toast]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
