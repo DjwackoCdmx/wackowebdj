@@ -4,7 +4,7 @@
 
 Este proyecto es una aplicación web interactiva que permite a los usuarios solicitar canciones a un DJ y enviar propinas. Cuenta con un panel de administración para el DJ y una interfaz de usuario pulida para los clientes.
 
-**Últimas Actualizaciones (Julio 2024):**
+**Últimas Actualizaciones (Julio 2025):**
 
 - **Mejora de la Interfaz:** Se eliminaron elementos redundantes y se mejoraron las animaciones para una experiencia de usuario más fluida.
 - **Corrección de Errores:** Se solucionaron errores críticos de compilación relacionados con la generación de tipos de Supabase y dependencias de React Hooks.
