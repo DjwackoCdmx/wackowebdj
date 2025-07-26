@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -39,6 +39,49 @@ const UserHistory = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // fetchHistory y fetchSavedSongs con useCallback declarados aquí, no debe haber duplicados abajo
+  const fetchHistory = useCallback(async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("song_requests")
+        .select("*")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setRequests(data || []);
+    } catch (error: unknown) {
+      const errMsg = error instanceof Error ? error.message : String(error);
+      toast({
+        title: "Error al cargar historial",
+        description: errMsg,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
+
+  const fetchSavedSongs = useCallback(async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("user_saved_songs")
+        .select("*")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setSavedSongs(data || []);
+    } catch (error: unknown) {
+      const errMsg = error instanceof Error ? error.message : String(error);
+      toast({
+        title: "Error al cargar canciones guardadas",
+        description: errMsg,
+        variant: "destructive",
+      });
+    }
+  }, [toast]);
+
   useEffect(() => {
     const getUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -51,60 +94,7 @@ const UserHistory = () => {
     };
 
     getUser();
-  }, [navigate]);
-
-  const fetchHistory = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from("song_requests")
-        .select("*")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      setRequests(data || []);
-    } catch (error: any) {
-      toast({
-        title: "Error al cargar historial",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchSavedSongs = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from("user_saved_songs")
-        .select("*")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      setSavedSongs(data || []);
-    } catch (error: any) {
-      toast({
-        title: "Error al cargar canciones guardadas",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleReorder = (request: UserSongRequest) => {
-    navigate("/", {
-      state: {
-        prefilledData: {
-          songName: request.song_name,
-          artistName: request.artist_name,
-          genre: request.genre || "",
-          tipAmount: request.tip_amount.toString(),
-        }
-      }
-    });
-  };
+  }, [navigate, fetchHistory, fetchSavedSongs]);
 
   const handleSaveSong = async (request: UserSongRequest) => {
     try {
@@ -128,10 +118,10 @@ const UserHistory = () => {
       if (user?.id) {
         await fetchSavedSongs(user.id);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error al guardar",
-        description: error.message,
+        description: error instanceof Error ? error.message : String(error),
         variant: "destructive",
       });
     }
@@ -154,10 +144,10 @@ const UserHistory = () => {
       if (user?.id) {
         await fetchSavedSongs(user.id);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error al eliminar",
-        description: error.message,
+        description: error instanceof Error ? error.message : String(error),
         variant: "destructive",
       });
     }

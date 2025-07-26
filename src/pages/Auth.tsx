@@ -110,10 +110,10 @@ const Auth = () => {
         // Force page reload for clean state
         window.location.href = '/';
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error al iniciar sesión",
-        description: error.message,
+        description: error instanceof Error ? error.message : String(error),
         variant: "destructive",
       });
     } finally {
@@ -175,10 +175,10 @@ const Auth = () => {
       setNickname("");
       setAcceptTerms(false);
       setPasswordErrors([]);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error en el registro",
-        description: error.message,
+        description: error instanceof Error ? error.message : String(error),
         variant: "destructive",
       });
     } finally {
@@ -222,10 +222,10 @@ const Auth = () => {
 
       // Force redirect to home page
       window.location.href = "/";
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error al eliminar cuenta",
-        description: error.message,
+        description: error instanceof Error ? error.message : String(error),
         variant: "destructive",
       });
     } finally {
