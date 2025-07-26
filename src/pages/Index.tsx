@@ -23,10 +23,10 @@ const musicGenres = [
   "Deep House", "Tech House", "Minimal", "Banda", "Circuit", "Otros"
 ];
 
-const Index = () => {
-  const { toast } = useToast();
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-neon rounded-full blur-3xl" />
+        <div className="absolute bottom-20 right-10 w-40 h-40 bg-gradient-electric rounded-full blur-3xl" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-primary rounded-full blur-3xl" style={{ animationDelay: '2s' }} />
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [isRequestTimeAllowed, setIsRequestTimeAllowed] = useState(true);
   const [scheduleMessage, setScheduleMessage] = useState("");
