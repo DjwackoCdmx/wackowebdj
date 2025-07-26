@@ -156,10 +156,10 @@ const Admin = () => {
         title: "¡Bienvenido DJ Wacko!",
         description: "Acceso concedido al panel de administración"
       });
-    } catch (error: unknown) {
+    } catch (error: any) {
       toast({
         title: "Error de acceso",
-        description: (error instanceof Error ? error.message : String(error)) || "Credenciales incorrectas",
+        description: error.message || "Credenciales incorrectas",
         variant: "destructive"
       });
     } finally {
@@ -184,10 +184,10 @@ const Admin = () => {
       });
       setShowResetPassword(false);
       setResetEmail("");
-    } catch (error: unknown) {
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: (error instanceof Error ? error.message : String(error)) || "No se pudo enviar el email",
+        description: error.message || "No se pudo enviar el email",
         variant: "destructive"
       });
     } finally {
