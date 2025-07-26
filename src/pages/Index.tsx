@@ -101,12 +101,9 @@ const Index = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', session.user.id)
-          .single();
-        setUserRole(profile?.role || null);
+        // The user role is available directly on the user object from Supabase Auth.
+        // This avoids making an unnecessary and incorrect database call.
+        setUserRole(session.user.role || null);
       } else {
         setUserRole(null);
       }
@@ -268,8 +265,8 @@ const Index = () => {
           </div>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-            <a href="https://wa.me/5256441274646" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 bg-green-600/20 text-green-400 rounded-lg hover:bg-green-600/30 transition-all duration-300 hover-scale">📱 +52 56 4412 7464</a>
-            <a href="https://twitter.com/DjwackoCDMX" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 bg-blue-600/20 text-blue-400 rounded-lg hover:bg-blue-600/30 transition-all duration-300 hover-scale">🐦 @DjwackoCDMX</a>
+            <a href="https://wa.me/5256441274646" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 bg-green-600/20 text-green-400 rounded-lg hover:bg-green-600/30 transition-all duration-300 hover-scale">📱 Contrataciones</a>
+            <a href="https://twitter.com/DjwackoCDMX" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 bg-blue-600/20 text-blue-400 rounded-lg hover:bg-blue-600/30 transition-all duration-300 hover-scale">🐦 Sígueme en Twitter</a>
           </div>
           
           {!isRequestTimeAllowed && (
