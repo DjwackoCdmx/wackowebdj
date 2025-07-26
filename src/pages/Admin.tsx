@@ -104,33 +104,24 @@ const Admin = () => {
           .select('id, user_id, name, email, created_at, updated_at, nickname, phone')
           .in('user_id', userIds);
 
-        if (profilesError) {
+        if (profilesError || !Array.isArray(profiles)) {
           toast({
             title: "Error",
-            description: "No se pudieron cargar los perfiles de usuario",
+            description: "No se pudieron cargar los perfiles de usuario. Verifica las columnas en Supabase.",
             variant: "destructive"
           });
           setOnlineUsers([]);
           return;
         }
 
-        if (Array.isArray(profiles)) {
-          setOnlineUsers(
-            profiles.map((p) => ({
-              id: typeof p.id === 'string' ? p.id : "",
-              user_id: typeof p.user_id === 'string' ? p.user_id : "",
-              name: typeof p.name === 'string' ? p.name : "",
-              email: typeof p.email === 'string' ? p.email : "",
-              nickname: typeof p.nickname === 'string' ? p.nickname : "",
-              phone: typeof p.phone === 'string' ? p.phone : "",
-              created_at: typeof p.created_at === 'string' ? p.created_at : "",
-              updated_at: typeof p.updated_at === 'string' ? p.updated_at : "",
-              is_online: true
-            }))
-          );
-        } else {
-          setOnlineUsers([]);
-        }
+        // Si no hay datos válidos, solo mostrar el toast y setear array vacío
+        toast({
+          title: "Error",
+          description: "No se pudieron cargar los perfiles de usuario. Verifica las columnas en Supabase.",
+          variant: "destructive"
+        });
+        setOnlineUsers([]);
+        return;
       } else {
         setOnlineUsers([]);
       }
