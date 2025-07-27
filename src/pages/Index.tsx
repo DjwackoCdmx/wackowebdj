@@ -48,6 +48,7 @@ const Index = ({ appState, onWelcomeAccept }: IndexProps) => {
     telegram: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const verifyPayment = useCallback(async (sessionId: string) => {
@@ -80,35 +81,14 @@ const Index = ({ appState, onWelcomeAccept }: IndexProps) => {
     }
   }, [toast]);
 
-  const checkUserRole = useCallback(async (user: SupabaseUser) => {
-    try {
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single();
-
-      if (error) throw error;
-
-      if (data) {
-        setIsAdmin(data.role === 'admin');
-      } else {
-        setIsAdmin(false);
-      }
-    } catch (error) {
-      console.error('Error fetching user role:', error);
-      setIsAdmin(false);
-    }
-  }, []);
+  
 
   useEffect(() => {
     const getSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
       setUser(session?.user ?? null);
-      if (session?.user) {
-        await checkUserRole(session.user);
-      }
+      
       setIsReady(true);
     };
 
@@ -132,6 +112,18 @@ const Index = ({ appState, onWelcomeAccept }: IndexProps) => {
 
 
 
+
+    useEffect(() => {
+    const hasSeenModal = localStorage.getItem('hasSeenWelcomeModal');
+    if (!hasSeenModal) {
+      setShowWelcomeModal(true);
+    }
+  }, []);
+
+  const handleCloseWelcomeModal = () => {
+    setShowWelcomeModal(false);
+    localStorage.setItem('hasSeenWelcomeModal', 'true');
+  };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -198,7 +190,8 @@ const Index = ({ appState, onWelcomeAccept }: IndexProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      <WelcomeModal open={showWelcomeModal} onAccept={handleCloseWelcomeModal} />
       <div className="absolute inset-0 h-full w-full bg-slate-950 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
       <div className="relative container mx-auto px-4 z-10">
         {!isReady ? (
