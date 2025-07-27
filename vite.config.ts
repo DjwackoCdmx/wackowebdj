@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => ({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: './src/setupTests.ts',
+    setupFiles: ['./vitest.setup.ts'],
   },
   build: {
     target: ['chrome90', 'firefox90', 'safari14', 'edge90'], // Compatibilidad con navegadores modernos

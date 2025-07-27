@@ -1,41 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Music, Play, Square, Trash2, Clock, DollarSign, MessageSquare, CheckCircle2, X, RefreshCw, User as UserIcon, Phone } from "lucide-react";
+import { Music, Play, Square, Trash2, Clock, DollarSign, MessageSquare, CheckCircle2, X, RefreshCw, User as UserIcon, Phone, BarChart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import AnalyticsDashboard from "@/components/admin/AnalyticsDashboard";
 import type { User } from "@supabase/supabase-js";
+import type { SongRequest, UserProfile } from "@/types";
 
-interface SongRequest {
-  id: string;
-  song_name: string;
-  artist_name: string;
-  genre?: string;
-  tip_amount: number;
-  requester_name?: string;
-  telegram_username?: string;
-  created_at: string;
-  payment_status: string;
-  played_status: string;
-  played_at?: string;
-  user_id?: string;
-}
 
-interface UserProfile {
-  id: string;
-  user_id: string;
-  name: string;
-  email: string;
-  nickname: string;
-  phone: string;
-  created_at: string;
-  updated_at: string;
-  is_online?: boolean;
-}
 
 const Admin = () => {
   const { toast } = useToast();
@@ -49,33 +26,7 @@ const Admin = () => {
   const [onlineUsers, setOnlineUsers] = useState<UserProfile[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    // Check for existing session
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
-      setLoading(false);
-    };
-
-    checkSession();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    if (user) {
-      fetchRequests();
-      fetchOnlineUsers();
-    }
-  }, [user]);
-
-  const fetchRequests = async () => {
+  const fetchRequests = useCallback(async () => {
     try {
       setRefreshing(true);
       const { data: pendingRequests, error: pendingError } = await supabase
@@ -85,34 +36,29 @@ const Admin = () => {
         .order('tip_amount', { ascending: false })
         .order('created_at', { ascending: true });
 
+      if (pendingError) throw pendingError;
+
       const { data: playedRequests, error: playedError } = await supabase
         .from('song_requests')
         .select('*')
         .eq('played_status', 'completed')
         .order('played_at', { ascending: false });
 
-      if (pendingError) throw pendingError;
       if (playedError) throw playedError;
 
       setRequests(pendingRequests || []);
       setHistory(playedRequests || []);
     } catch (error) {
       console.error('Error fetching requests:', error);
-      toast({
-        title: "Error",
-        description: "No se pudieron cargar las solicitudes",
-        variant: "destructive"
-      });
+      toast({ title: "Error", description: "No se pudieron cargar las solicitudes", variant: "destructive" });
     } finally {
       setRefreshing(false);
     }
-  };
+  }, [toast]);
 
-  const fetchOnlineUsers = async () => {
+  const fetchOnlineUsers = useCallback(async () => {
     try {
-      // Get users who have made requests in the last 30 minutes
       const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();
-      
       const { data: recentRequests, error: requestsError } = await supabase
         .from('song_requests')
         .select('user_id')
@@ -125,20 +71,54 @@ const Admin = () => {
       
       if (userIds.length > 0) {
         const { data: profiles, error: profilesError } = await supabase
-          .from('user_profiles')
+          .from('user_profiles') // CORREGIDO: 'profiles' -> 'user_profiles'
           .select('*')
           .in('user_id', userIds);
 
         if (profilesError) throw profilesError;
-
-        setOnlineUsers(profiles?.map(p => ({ ...p, is_online: true })) || []);
+        setOnlineUsers(profiles || []);
       } else {
         setOnlineUsers([]);
       }
     } catch (error) {
       console.error('Error fetching online users:', error);
+      toast({ title: "Error", description: "No se pudieron cargar los usuarios en línea", variant: "destructive" });
     }
-  };
+  }, [toast]);
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await Promise.all([fetchRequests(), fetchOnlineUsers()]);
+    } catch (error) {
+      console.error('Error during refresh:', error);
+      toast({ title: "Error", description: "Ocurrió un error al actualizar los datos", variant: "destructive" });
+    } finally {
+      setRefreshing(false);
+    }
+  }, [fetchRequests, fetchOnlineUsers, toast]);
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user ?? null);
+      setLoading(false);
+    };
+    checkSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      handleRefresh();
+    }
+  }, [user, handleRefresh]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -156,10 +136,11 @@ const Admin = () => {
         title: "¡Bienvenido DJ Wacko!",
         description: "Acceso concedido al panel de administración"
       });
-    } catch (error: any) {
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Ocurrió un error desconocido";
       toast({
         title: "Error de acceso",
-        description: error.message || "Credenciales incorrectas",
+        description: message || "Credenciales incorrectas",
         variant: "destructive"
       });
     } finally {
@@ -184,10 +165,11 @@ const Admin = () => {
       });
       setShowResetPassword(false);
       setResetEmail("");
-    } catch (error: any) {
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Ocurrió un error desconocido";
       toast({
         title: "Error",
-        description: error.message || "No se pudo enviar el email",
+        description: message || "No se pudo enviar el email",
         variant: "destructive"
       });
     } finally {
@@ -404,10 +386,7 @@ const Admin = () => {
           <div className="flex gap-2">
             <Button 
               variant="outline" 
-              onClick={() => {
-                fetchRequests();
-                fetchOnlineUsers();
-              }}
+              onClick={handleRefresh}
               disabled={refreshing}
             >
               {refreshing ? (
@@ -426,15 +405,20 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="queue" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
+          <TabsList className="grid w-full grid-cols-4 mb-8">
             <TabsTrigger value="queue" className="text-lg">
               🎵 Cola ({requests.length})
             </TabsTrigger>
             <TabsTrigger value="history" className="text-lg">
               📋 Historial ({history.length})
             </TabsTrigger>
-            <TabsTrigger value="users" className="text-lg">
-              👥 Usuarios ({onlineUsers.length})
+            <TabsTrigger value="users">
+              <UserIcon className="w-4 h-4 mr-2" />
+              Usuarios ({onlineUsers.length})
+            </TabsTrigger>
+            <TabsTrigger value="analytics">
+              <BarChart className="w-4 h-4 mr-2" />
+              Estadísticas
             </TabsTrigger>
           </TabsList>
 
@@ -680,6 +664,11 @@ const Admin = () => {
                 </Card>
               ))
             )}
+          </TabsContent>
+
+          {/* Analytics Tab */}
+          <TabsContent value="analytics">
+            <AnalyticsDashboard requests={history} />
           </TabsContent>
         </Tabs>
       </div>
