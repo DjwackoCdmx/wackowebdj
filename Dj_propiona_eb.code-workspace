@@ -14,6 +14,7 @@
 		}
 	],
 	"settings": {
-		"powershell.cwd": "Dj_propiona_eb"
+		"powershell.cwd": "Dj_propiona_eb",
+		"java.configuration.updateBuildConfiguration": "automatic"
 	}
 }
