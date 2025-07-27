@@ -1,5 +1,15 @@
 # Sistema de Propinas para DJ "DJ Wacko" - v1.0
 
+## Proceso de Publicación de APK en GitHub
+
+Para asegurar que el enlace de descarga directa de la aplicación siempre funcione, es crucial seguir estos pasos al crear una nueva "Release" en GitHub:
+
+1. **Generar el APK:** Compila y genera el archivo APK firmado desde Android Studio.
+2. **Nombrar el Archivo:** Antes de subirlo, renombra el archivo APK a **`app-release.apk`**.
+3. **Subir a GitHub:** Crea una nueva release en el repositorio y sube el archivo `app-release.apk` como un "asset" o activo.
+
+**Importante:** El nombre del archivo debe ser exactamente `app-release.apk`. De lo contrario, el botón de descarga en la aplicación no funcionará.
+
 Este proyecto es una aplicación web moderna diseñada para que los DJs gestionen solicitudes de canciones y reciban propinas de manera digital durante sus eventos. El público puede escanear un código QR, acceder a la página, solicitar una canción y enviar una propina, todo desde su celular.
 
 ## Características Principales
