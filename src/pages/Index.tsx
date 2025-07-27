@@ -677,13 +677,17 @@ const Index = () => {
               </Button>
             </div>
             <div className="mt-6">
-              <Button 
-                onClick={() => window.open('/DJ-Wacko-Propinas.apk', '_blank')}
-                className="bg-gradient-to-r from-green-500 to-teal-500 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 hover:brightness-110"
+              <a
+                href="URL_DE_TU_RELEASE_DE_GITHUB_AQUI"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full"
               >
-                <Download className="w-5 h-5 mr-2" />
-                Descargar APK para Android
-              </Button>
+                <Button variant="outline" className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-300 ease-in-out transform hover:scale-105">
+                  <Download className="mr-2 h-4 w-4" />
+                  Descargar APK para Android
+                </Button>
+              </a>
             </div>
           </div>
 
