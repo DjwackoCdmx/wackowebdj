@@ -46,7 +46,9 @@ const Index = () => {
 
   const verifyPayment = useCallback(async (sessionId: string) => {
     try {
-      const { data, error } = await supabase.rpc('verify_payment_session', { session_id: sessionId });
+      const { error } = await supabase.functions.invoke('verify-payment', {
+        body: { session_id: sessionId }
+      });
       
       if (error) throw error;
 
