@@ -17,15 +17,26 @@ import NotFound from './pages/NotFound';
 const queryClient = new QueryClient();
 
 function App() {
-  const [loading, setLoading] = useState(true);
+  const [appState, setAppState] = useState<'loading' | 'welcome' | 'ready'>('loading');
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 3000); // 3 segundos de pantalla de carga
+    const hasAccepted = localStorage.getItem('hasAcceptedWelcomeModal');
 
-    return () => clearTimeout(timer);
+    const loadingTimer = setTimeout(() => {
+      if (!hasAccepted) {
+        setAppState('welcome');
+      } else {
+        setAppState('ready');
+      }
+    }, 2500); // 2.5 segundos de pantalla de carga
+
+    return () => clearTimeout(loadingTimer);
   }, []);
+
+  const handleWelcomeAccept = () => {
+    // Guardamos la aceptación en localStorage desde Index, pero actualizamos el estado aquí
+    setAppState('ready');
+  };
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -34,19 +45,19 @@ function App() {
         <Sonner />
         <Router>
           <AnimatePresence mode="wait">
-            {loading && <LoadingScreen />}
+            {appState === 'loading' && <LoadingScreen key="loading" />}
           </AnimatePresence>
-          {!loading && (
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/genre/:genreName" element={<Index />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/history" element={<UserHistory />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          )}
+
+          {/* Renderiza las rutas siempre, pero el contenido de la página Index se adaptará */}
+          <Routes>
+            <Route path="/" element={<Index appState={appState} onWelcomeAccept={handleWelcomeAccept} />} />
+            <Route path="/genre/:genreName" element={<Index appState={appState} onWelcomeAccept={handleWelcomeAccept} />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/history" element={<UserHistory />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </Router>
       </TooltipProvider>
     </QueryClientProvider>

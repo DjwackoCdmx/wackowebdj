@@ -4,13 +4,13 @@ import { motion } from "framer-motion";
 import { Music, Gift, Rocket } from 'lucide-react';
 
 interface WelcomeModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+  open: boolean;
+  onAccept: () => void;
 }
 
-const WelcomeModal = ({ isOpen, onClose }: WelcomeModalProps) => {
+const WelcomeModal: React.FC<WelcomeModalProps> = ({ open, onAccept }) => {
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={onAccept}>
       <DialogContent className="bg-black/80 backdrop-blur-sm border-purple-500/50 text-white sm:max-w-[480px] p-0">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -46,7 +46,7 @@ const WelcomeModal = ({ isOpen, onClose }: WelcomeModalProps) => {
           </div>
           <div className="p-6 bg-black/30 rounded-b-lg">
             <Button 
-              onClick={onClose} 
+              onClick={onAccept} 
               className="w-full bg-gradient-to-r from-purple-600 to-pink-500 text-white font-bold text-lg h-12 hover:scale-105 transition-transform duration-300"
             >
               ¡Entendido, a rockear!
