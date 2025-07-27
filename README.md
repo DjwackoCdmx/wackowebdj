@@ -1,5 +1,7 @@
 # Sistema de Propinas para DJ "DJ Wacko" - v1.0
 
+[![Descargar APK](https://img.shields.io/badge/Descargar-APK-brightgreen.svg)](https://github.com/DjwackoCdmx/wackowebdj/releases/latest/download/app-release.apk)
+
 ## Proceso de Publicación de APK en GitHub
 
 Para asegurar que el enlace de descarga directa de la aplicación siempre funcione, es crucial seguir estos pasos al crear una nueva "Release" en GitHub:
