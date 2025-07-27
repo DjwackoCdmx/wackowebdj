@@ -7,10 +7,15 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Local dependencies
 node_modules
+
+# Build artifacts
 dist
 dist-ssr
 *.local
+*.apk
+*.aab
 
 # Editor directories and files
 .vscode/*
