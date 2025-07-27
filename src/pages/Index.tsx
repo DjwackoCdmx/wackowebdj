@@ -678,7 +678,7 @@ const Index = () => {
             </div>
             <div className="mt-6">
               <a
-                href="URL_DE_TU_RELEASE_DE_GITHUB_AQUI"
+                href="https://github.com/DjwackoCdmx/wackowebdj/releases/download/v1.0.0/dj-propiona-eb-latest.apk"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full"
