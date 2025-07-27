@@ -46,7 +46,7 @@ const Index = () => {
 
   const verifyPayment = useCallback(async (sessionId: string) => {
     try {
-      const { error } = await supabase.functions.invoke('verify-payment', {
+      const { data, error } = await supabase.functions.invoke('verify-payment', {
         body: { session_id: sessionId }
       });
       
@@ -684,6 +684,7 @@ const Index = () => {
           <div className="mt-4 text-xs text-muted-foreground">
             <p>&copy; {new Date().getFullYear()} Djwacko. Todos los derechos reservados.</p>
             <p>Developer: Juan C. Mendez N.</p>
+            <p className="mt-2 text-xs text-gray-500">v1.0</p>
           </div>
         </footer>
       </div>

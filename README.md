@@ -1,57 +1,97 @@
-# Bienvenido a tu proyecto DjWacko
+# Sistema de Propinas para DJ "DJ Wacko" - v1.0
 
-## Estado del Proyecto
+Este proyecto es una aplicación web moderna diseñada para que los DJs gestionen solicitudes de canciones y reciban propinas de manera digital durante sus eventos. El público puede escanear un código QR, acceder a la página, solicitar una canción y enviar una propina, todo desde su celular.
 
-Este proyecto es una aplicación web interactiva que permite a los usuarios solicitar canciones a un DJ y enviar propinas. Cuenta con un panel de administración para el DJ y una interfaz de usuario pulida para los clientes.
+## Características Principales
 
-**Últimas Actualizaciones (Julio 2025):**
+### Vista Pública
 
-- **Mejora de la Interfaz:** Se eliminaron elementos redundantes y se mejoraron las animaciones para una experiencia de usuario más fluida.
-- **Corrección de Errores:** Se solucionaron errores críticos de compilación relacionados con la generación de tipos de Supabase y dependencias de React Hooks.
-- **Actualización de Título:** El título de la página se ha actualizado a "DjWacko".
+- **Formulario de Solicitud:** Interfaz simple para que el público pida canciones, especifique el artista y envíe una propina.
+- **Múltiples Métodos de Pago:** Integración con Stripe para pagos con tarjeta y Coinbase Commerce para criptomonedas.
+- **Accesibilidad:** Diseño responsivo que funciona en cualquier dispositivo móvil.
+
+### Panel de Administración (Exclusivo para el DJ)
+
+- **Login Seguro:** Acceso protegido para la gestión del evento.
+- **Cola de Solicitudes:** Las canciones solicitadas aparecen en una lista priorizada automáticamente por el monto de la propina.
+- **Historial de Pagos:** Registro de todas las transacciones recibidas.
+- **Gestión en Tiempo Real:** El DJ puede ver y gestionar las solicitudes a medida que llegan.
 
 ## Tecnologías Utilizadas
 
-Este proyecto está construido con un stack moderno y robusto:
+- **Frontend:** React 18 + Vite + TypeScript
+- **UI Framework:** shadcn-ui sobre Tailwind CSS
+- **Backend & Base de Datos:** Supabase (Base de Datos PostgreSQL, Autenticación, Edge Functions)
+- **Pasarelas de Pago:** Stripe y Coinbase Commerce
+- **Hosting:** Vercel para despliegue continuo.
+- **Aplicación Móvil (Android):** Compilada usando Capacitor.js.
 
-- **Framework:** React (con Vite)
-- **Lenguaje:** TypeScript
-- **Backend y Base de Datos:** Supabase
-- **UI:** shadcn-ui y Tailwind CSS
-- **Gestor de Paquetes:** pnpm
+## Estructura del Proyecto
+
+El proyecto sigue una estructura de monorepo, separando la lógica del frontend, las funciones del backend y la configuración de la app móvil.
+
+```bash
+/
+├── android/          # Código fuente de la App para Android
+├── public/           # Archivos estáticos (íconos, APK)
+├── src/              # Código fuente principal del frontend (React)
+│   ├── components/   # Componentes reutilizables de la UI
+│   ├── pages/        # Páginas principales (Index, Admin, etc.)
+│   └── lib/          # Lógica auxiliar y configuración (Supabase, etc.)
+├── supabase/
+│   ├── functions/    # Edge Functions (lógica de pagos)
+│   └── migrations/   # Migraciones de la base de datos
+├── README.md         # Este archivo
+└── package.json      # Dependencias y scripts
+```
 
 ## Cómo Empezar
 
-Para trabajar en este proyecto localmente, sigue estos pasos:
+### Prerrequisitos
 
-1. **Clona el repositorio:**
+- Node.js (v18 o superior)
+- pnpm (o npm/yarn)
+- Tener una cuenta de Supabase, Stripe y Coinbase.
 
-   ```sh
-   git clone https://github.com/DjwackoCdmx/wackowebdj.git
-   ```
+### 1. Clonar el Repositorio
 
-2. **Navega al directorio del proyecto:**
+```bash
+git clone https://github.com/DjwackoCdmx/wackowebdj.git
+cd wackowebdj
+```
 
-   ```sh
-   cd wackowebdj
-   ```
+### 2. Instalar Dependencias
 
-3. **Instala las dependencias:**
+```bash
+pnpm install
+```
 
-   (Asegúrate de tener [pnpm](https://pnpm.io/installation) instalado).
+### 3. Configurar Variables de Entorno
 
-   ```sh
-   pnpm install
-   ```
+Crea un archivo `.env` en la raíz del proyecto y añade tus claves de Supabase, Stripe y Coinbase. Puedes usar `.env.example` como plantilla.
 
-4. **Inicia el servidor de desarrollo:**
+### 4. Ejecutar el Proyecto
 
-   ```sh
-   pnpm run dev
-   ```
+```bash
+pnpm run dev
+```
 
-La aplicación estará disponible en `http://localhost:8080`.
+## Compilar la APK de Android
 
-## Despliegue
+Para generar el archivo de instalación para Android, asegúrate de tener el entorno de Android Studio configurado y ejecuta:
 
-El proyecto está configurado para ser desplegado fácilmente en plataformas como Vercel, Netlify o directamente usando la CLI de Supabase.
+```bash
+cd android
+./gradlew.bat assembleDebug
+```
+
+El archivo `.apk` se encontrará en `android/app/build/outputs/apk/debug/`.
+
+## Próximos Pasos (Roadmap v2.0)
+
+- [ ] **Tests Automatizados:** Implementar pruebas unitarias y de integración para las funciones de pago.
+- [ ] **Panel de Admin Avanzado:** Añadir gráficas y estadísticas en tiempo real.
+- [ ] **Notificaciones Push:** Notificar al DJ sobre nuevas propinas.
+- [ ] **Internacionalización (i18n):** Permitir cambiar el idioma de la interfaz.
+- [ ] **Progressive Web App (PWA):** Mejorar la experiencia móvil y permitir el uso offline.
+- [ ] **Optimización SEO:** Mejorar el posicionamiento en buscadores.
