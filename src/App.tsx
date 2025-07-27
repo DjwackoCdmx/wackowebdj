@@ -19,7 +19,8 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
+                    <Route path="/" element={<Index />} />
+          <Route path="/genre/:genreName" element={<Index />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/history" element={<UserHistory />} />

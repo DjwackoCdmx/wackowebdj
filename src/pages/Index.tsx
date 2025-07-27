@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,6 +24,7 @@ const musicGenres = [
 ];
 
 const Index = () => {
+  const { genreName } = useParams<{ genreName: string }>();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -118,6 +119,15 @@ const Index = () => {
 
     return () => subscription.unsubscribe();
   }, [searchParams, toast, verifyPayment]);
+
+  useEffect(() => {
+    if (genreName) {
+      const formattedGenreName = decodeURIComponent(genreName);
+      if (musicGenres.includes(formattedGenreName)) {
+        setFormData(prev => ({ ...prev, genre: formattedGenreName }));
+      }
+    }
+  }, [genreName]);
 
   const checkRequestTimeAllowed = async () => {
     try {
