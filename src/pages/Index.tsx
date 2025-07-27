@@ -15,6 +15,7 @@ import djHeroBg from "@/assets/dj-hero-bg.jpg";
 import djWackoMainLogo from "@/assets/dj-wacko-main-logo.gif";
 import djWackoLogoText from "@/assets/dj-wacko-logo-text.png";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
+import WelcomeModal from "@/components/custom/WelcomeModal";
 
 const musicGenres = [
   "Reggaeton", "Techno", "House", "Electro", "EDM", "Hip-Hop", "Trap", 
@@ -43,7 +44,8 @@ const Index = () => {
   const [showCustomGenre, setShowCustomGenre] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
+    const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
   const verifyPayment = useCallback(async (sessionId: string) => {
     try {
@@ -127,7 +129,14 @@ const Index = () => {
         setFormData(prev => ({ ...prev, genre: formattedGenreName }));
       }
     }
-  }, [genreName]);
+    }, [genreName]);
+
+  useEffect(() => {
+    const hasSeenModal = localStorage.getItem('hasSeenWelcomeModal');
+    if (!hasSeenModal) {
+      setShowWelcomeModal(true);
+    }
+  }, []);
 
   const checkRequestTimeAllowed = async () => {
     try {
@@ -143,6 +152,11 @@ const Index = () => {
       console.error('Error checking request time:', error);
       setScheduleMessage("No se pudo verificar el horario de solicitudes. Intenta más tarde.");
     }
+  };
+
+    const handleCloseWelcomeModal = () => {
+    setShowWelcomeModal(false);
+    localStorage.setItem('hasSeenWelcomeModal', 'true');
   };
 
   const handleSignOut = async () => {
@@ -280,7 +294,8 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
+        <div className="min-h-screen bg-background relative overflow-hidden">
+      <WelcomeModal isOpen={showWelcomeModal} onClose={handleCloseWelcomeModal} />
       {/* Background Image with Overlay */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
