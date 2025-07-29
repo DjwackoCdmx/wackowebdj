@@ -98,8 +98,22 @@ const Index = ({ appState, onWelcomeAccept }: IndexProps) => {
       setSession(session);
       const currentUser = session?.user ?? null;
       setUser(currentUser);
+
       if (currentUser) {
-        await checkUserRole(currentUser);
+        try {
+          const { data: userProfile, error } = await supabase
+            .from('user_profiles')
+            .select('is_admin')
+            .eq('id', currentUser.id)
+            .single();
+
+          if (error) throw error;
+
+          setIsAdmin(userProfile?.is_admin || false);
+        } catch (error) {
+          console.error('Error fetching user role:', error);
+          setIsAdmin(false);
+        }
       } else {
         setIsAdmin(false);
       }
@@ -108,7 +122,7 @@ const Index = ({ appState, onWelcomeAccept }: IndexProps) => {
     return () => {
       authListener.subscription.unsubscribe();
     };
-  }, [checkUserRole]);
+  }, []);
 
 
 
