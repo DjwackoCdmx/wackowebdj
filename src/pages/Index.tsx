@@ -99,8 +99,12 @@ export default function Index() {
   useEffect(() => {
     const initializeSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
+      console.log("--- SESIÓN INICIAL ---", session);
       setUser(session?.user ?? null);
-      setIsAdmin(session?.user?.user_metadata?.role === 'admin');
+
+      const isAdminCheck = session?.user?.user_metadata?.role === 'admin';
+      setIsAdmin(isAdminCheck);
+      console.log("Verificación de Admin (al inicio):", isAdminCheck, "(Metadata: ", session?.user?.user_metadata, ")");
 
       const hasSeenModal = localStorage.getItem('hasSeenWelcomeModal');
       if (!hasSeenModal && !session?.user) {
@@ -114,8 +118,11 @@ export default function Index() {
     initializeSession();
 
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("--- CAMBIO DE AUTENTICACIÓN ---", session);
       setUser(session?.user ?? null);
-      setIsAdmin(session?.user?.user_metadata?.role === 'admin');
+      const isAdminCheck = session?.user?.user_metadata?.role === 'admin';
+      setIsAdmin(isAdminCheck);
+      console.log("Verificación de Admin (on change):", isAdminCheck, "(Metadata: ", session?.user?.user_metadata, ")");
     });
 
     return () => {

@@ -4,6 +4,8 @@ Bienvenido a la plataforma interactiva de DJ Wacko. Esta aplicación permite a l
 
 ![DJ Wacko](src/assets/dj-wacko-main-logo.gif)
 
+[![Descargar APK](https://img.shields.io/badge/Descargar-APK-brightgreen.svg)](https://github.com/DjwackoCdmx/wackowebdj/releases/latest/download/app-release.apk)
+
 ## ✨ Características Principales
 
 - **Solicitudes en Tiempo Real:** Envía tus peticiones musicales directamente a la cabina del DJ.
@@ -13,38 +15,33 @@ Bienvenido a la plataforma interactiva de DJ Wacko. Esta aplicación permite a l
 - **Diseño Moderno y Adaptable:** Experiencia de usuario fluida en web y móvil.
 - **Aplicación Android:** Descarga el APK para tener la experiencia nativa en tu dispositivo.
 
-## 🚀 Cómo Empezar (Puesta en Marcha)
+## 🚀 Puesta en Marcha Local
 
-Sigue estos pasos para ejecutar el proyecto en tu entorno local.
+Sigue estos pasos para ejecutar el proyecto en tu entorno de desarrollo.
 
-### Prerrequisitos
+### 1. Prerrequisitos
 
 - [Node.js](https://nodejs.org/) (versión 18 o superior)
 - [pnpm](https://pnpm.io/installation) como gestor de paquetes
 
-### 1. Clonar el Repositorio
+### 2. Clonar e Instalar
 
 ```bash
 git clone https://github.com/DjwackoCdmx/wackowebdj.git
 cd wackowebdj
-```
-
-### 2. Instalar Dependencias
-
-```bash
 pnpm install
 ```
 
 ### 3. Configurar Variables de Entorno
 
-Crea un archivo `.env` en la raíz del proyecto copiando el contenido de `.env.example` (si existe) o añadiendo las siguientes claves de Supabase:
+Crea un archivo `.env` en la raíz del proyecto y añade tus claves de Supabase:
 
-```
+```env
 VITE_SUPABASE_URL=TU_URL_DE_SUPABASE
 VITE_SUPABASE_ANON_KEY=TU_LLAVE_ANONIMA_DE_SUPABASE
 ```
 
-### 4. Iniciar el Servidor de Desarrollo
+### 4. Ejecutar la Aplicación
 
 ```bash
 pnpm dev
@@ -52,27 +49,42 @@ pnpm dev
 
 La aplicación estará disponible en [http://localhost:5173](http://localhost:5173).
 
-## 🛠️ Para Desarrolladores
+## 📲 Compilación de la App Android (APK)
 
-Este proyecto sigue una estricta política de documentación para asegurar su mantenibilidad y facilitar la colaboración.
+Para generar el archivo de instalación para Android, sigue estos pasos:
 
-**Toda la información técnica, arquitectura, estructura de directorios y registro de cambios se encuentra en la guía para desarrolladores.**
+1. Compilar la aplicación web:
+
+   ```bash
+   pnpm build
+   ```
+
+2. Sincronizar con Capacitor:
+
+   ```bash
+   npx cap sync
+   ```
+
+3. Abrir en Android Studio:
+
+   ```bash
+   npx cap open android
+   ```
+
+4. Generar el APK Firmado:
+   - Dentro de Android Studio, ve a `Build > Generate Signed Bundle / APK...`.
+   - Sigue las instrucciones para firmar la aplicación. El APK se guardará en `android/app/release/app-release.apk`.
+
+5. Subir a GitHub Releases:
+   - Para que el botón de descarga funcione, crea una nueva "Release" en GitHub y sube el archivo `app-release.apk`.
+
+## 🛠️ Guía para Desarrolladores
+
+Este proyecto tiene una documentación técnica detallada que es **de lectura obligatoria** antes de realizar cambios.
 
 ➡️ **[Consulta la Guía para Desarrolladores (DEVELOPER_GUIDE.md)](./DEVELOPER_GUIDE.md)**
 
-Es **obligatorio** leer y seguir las directrices de este documento antes de realizar cualquier cambio en el código.
-
-[![Descargar APK](https://img.shields.io/badge/Descargar-APK-brightgreen.svg)](https://github.com/DjwackoCdmx/wackowebdj/releases/latest/download/app-release.apk)
-
-## Proceso de Publicación de APK en GitHub
-
-Para asegurar que el enlace de descarga directa de la aplicación siempre funcione, es crucial seguir estos pasos al crear una nueva "Release" en GitHub:
-
-1. **Generar el APK:** Compila y genera el archivo APK firmado desde Android Studio.
-2. **Nombrar el Archivo:** Antes de subirlo, renombra el archivo APK a **`app-release.apk`**.
-3. **Subir a GitHub:** Crea una nueva release en el repositorio y sube el archivo `app-release.apk` como un "asset" o activo.
-
-**Importante:** El nombre del archivo debe ser exactamente `app-release.apk`. De lo contrario, el botón de descarga en la aplicación no funcionará.
+En ella encontrarás la arquitectura, la estructura de directorios y el registro de cambios.
 
 ## Tecnologías Utilizadas
 
@@ -102,8 +114,9 @@ El proyecto sigue una estructura de monorepo, separando la lógica del frontend,
 └── package.json      # Dependencias y scripts
 ```
 
-## Cómo Empezar
+## Proceso de Publicación de APK en GitHub
 
+Para asegurar que el enlace de descarga directa de la aplicación siempre funcione, es crucial seguir estos pasos al crear una nueva "Release" en GitHub:
 ### Prerrequisitos
 
 - Node.js (v18 o superior)
