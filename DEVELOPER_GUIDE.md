@@ -1,99 +1,91 @@
-# Guía para Desarrolladores - Proyecto DJ Wacko
+# Guía para Desarrolladores - Plataforma DJ Wacko
 
-**Última actualización:** 28 de Julio, 2025
+Este documento contiene toda la información técnica necesaria para entender, mantener y extender el proyecto.
 
-## 1. Contexto del Proyecto
+## 🚀 Pila Tecnológica (Tech Stack)
 
-Este documento es la fuente de verdad para el desarrollo y mantenimiento de la aplicación web y móvil de DJ Wacko. El objetivo de este proyecto es proporcionar una plataforma interactiva para que los fans soliciten canciones, envíen propinas y se mantengan conectados con el artista.
+- **Framework:** Next.js (con React 18)
+- **Lenguaje:** TypeScript
+- **UI:** shadcn/ui sobre Radix UI y Tailwind CSS
+- **Backend & Autenticación:** Supabase (PostgreSQL, Auth, Edge Functions)
+- **Herramientas de Build:** Vite
 
-La aplicación está construida como un monorepo que incluye:
+## ⚙️ Configuración del Entorno Local
 
-- Un frontend web moderno desarrollado con **React (Vite) y TypeScript**.
-- Componentes UI de alta calidad de **shadcn/ui** sobre **Tailwind CSS**.
-- Un backend-as-a-service gestionado por **Supabase** (Autenticación, Base de Datos PostgreSQL).
-- Integración de pagos a través de la API de **Coinbase Commerce**.
-- Capacidades de aplicación móvil a través de **Capacitor**, generando un APK para Android.
+Sigue estos pasos para levantar el proyecto en tu entorno local.
 
-## 2. Política Obligatoria de Documentación de Cambios
+### 1. Prerrequisitos
 
-**Cualquier cambio, corrección de error o nueva característica implementada en este proyecto DEBE ser documentada en la sección `4. Registro de Cambios y Decisiones` de este archivo ANTES de hacer `commit` y `push` al repositorio.**
+- Node.js (v18 o superior)
+- pnpm (o npm/yarn)
+- Una cuenta de Supabase y la CLI de Supabase instalada.
 
-Esta regla no es negociable y su propósito es:
+### 2. Instalación
 
-- **Prevenir la repetición de errores:** Entender qué se ha intentado y por qué falló.
-- **Facilitar la incorporación:** Permitir que futuros desarrolladores entiendan la evolución del código.
-- **Mantener la consistencia:** Asegurar que las decisiones de arquitectura se respeten y comprendan.
+1. **Clona el repositorio:**
 
-Cada entrada en el registro debe incluir:
+    ```bash
+    git clone <URL_DEL_REPOSITORIO>
+    cd <NOMBRE_DEL_DIRECTORIO>
+    ```
 
-- **Fecha:**
-- **Componente(s) Afectado(s):**
-- **Descripción del Problema/Cambio:**
-- **Solución Implementada:**
-- **Desarrollador:**
+2. **Instala las dependencias:**
 
-## 3. Estructura de Directorios (Árbol Principal)
+    ```bash
+    pnpm install
+    ```
+
+### 3. Configuración de Entorno
+
+1. Crea un archivo `.env.local` en la raíz del proyecto.
+2. Añade las credenciales de tu proyecto de Supabase:
+
+    ```env
+    NEXT_PUBLIC_SUPABASE_URL=URL_DE_TU_PROYECTO_SUPABASE
+    NEXT_PUBLIC_SUPABASE_ANON_KEY=TU_LLAVE_ANONIMA_DE_SUPABASE
+    ```
+
+### 4. Ejecuta el Proyecto
 
 ```bash
-Dj_propiona_eb/
-├── android/          # Código nativo de Android (generado por Capacitor)
-├── build/            # Archivos de compilación de Android
-├── dist/             # Archivos de producción de la aplicación web
-├── public/           # Archivos estáticos (imágenes, favicons)
-├── src/              # ¡EL CORAZÓN DE LA APLICACIÓN!
-│   ├── assets/       # Imágenes y logos específicos de la UI
-│   ├── components/   # Componentes de React reutilizables
-│   │   ├── custom/   # Componentes personalizados (ej. LoadingScreen)
-│   │   └── ui/       # Componentes de shadcn/ui (Botones, Cards, etc.)
-│   ├── hooks/        # Hooks de React personalizados (ej. use-toast)
-│   ├── integrations/ # Lógica para conectar con servicios externos
-│   │   └── supabase/ # Cliente y configuración de Supabase
-│   ├── lib/          # Funciones de utilidad (ej. cn para clases CSS)
-│   ├── pages/        # Componentes que representan páginas completas
-│   │   ├── Admin.tsx
-│   │   ├── Auth.tsx
-│   │   ├── Index.tsx  (Página principal y núcleo de la lógica)
-│   │   └── ...
-│   ├── App.tsx       # Definición de rutas principales (Router)
-│   └── main.tsx      # Punto de entrada de la aplicación React
-├── supabase/         # Migraciones y configuración de la DB de Supabase
-├── .env              # Variables de entorno (NUNCA SUBIR A GIT)
-├── capacitor.config.ts # Configuración de Capacitor para la app móvil
-├── package.json      # Dependencias y scripts del proyecto
-├── README.md         # Guía para el usuario final
-└── DEVELOPER_GUIDE.md # Esta guía
+pnpm run dev
 ```
 
-## 4. Registro de Cambios y Decisiones
+La aplicación estará disponible en `http://localhost:3000`.
 
----
+## 🔧 Arquitectura del Backend (Supabase)
 
-- **Fecha:** 29 de Julio, 2025
-- **Componente(s) Afectado(s):** `src/pages/Index.tsx`, `src/pages/Auth.tsx`
-- **Descripción del Problema/Cambio:** Se necesitaba mejorar la experiencia de los nuevos usuarios y la accesibilidad de la información de contacto. La página principal solo tenía un botón de "Iniciar Sesión", lo que podía ser confuso para quienes deseaban registrarse. Además, la información de contacto (WhatsApp, Twitter) no estaba visible.
-- **Solución Implementada:**
-  1. En `Index.tsx`, se reemplazó el botón único por dos botones distintos: "Iniciar Sesión" y "Registrarse".
-  2. Se añadió una sección de contacto prominente con enlaces directos a WhatsApp y Twitter, utilizando iconos para mejorar la visibilidad.
-  3. En `Auth.tsx`, se implementó lógica para detectar el estado de navegación, permitiendo que el clic en "Registrarse" lleve directamente al formulario de registro, creando un flujo de usuario más intuitivo.
-- **Desarrollador:** Cascade (asistente de IA)
+El proyecto depende de dos funciones RPC clave en Supabase para la lógica de negocio:
 
----
+- `is_admin()`: Verifica si el usuario autenticado tiene el rol de administrador. Se basa en Row Level Security (RLS) para ser segura.
+- `is_request_time_allowed()`: Devuelve `true` o `false` para controlar si el formulario de solicitudes está activo. Esto permite al DJ controlar el flujo de solicitudes durante un evento.
 
-- **Fecha:** 29 de Julio, 2025
-- **Componente(s) Afectado(s):** `src/pages/Index.tsx`, `src/pages/Auth.tsx`
-- **Descripción del Problema/Cambio:** Se necesitaba mejorar la experiencia de los nuevos usuarios y la accesibilidad de la información de contacto. La página principal solo tenía un botón de "Iniciar Sesión", lo que podía ser confuso para quienes deseaban registrarse. Además, la información de contacto (WhatsApp, Twitter) no estaba visible.
-- **Solución Implementada:**
-  1. En `Index.tsx`, se reemplazó el botón único por dos botones distintos: "Iniciar Sesión" y "Registrarse".
-  2. Se añadió una sección de contacto prominente con enlaces directos a WhatsApp y Twitter, utilizando iconos para mejorar la visibilidad.
-  3. En `Auth.tsx`, se implementó lógica para detectar el estado de navegación, permitiendo que el clic en "Registrarse" lleve directamente al formulario de registro, creando un flujo de usuario más intuitivo.
-- **Desarrollador:** Cascade (asistente de IA)
+## ⚠️ Solución de Problemas (Troubleshooting)
 
----
+### Error de Tipado en `supabase.rpc()`
 
-- **Fecha:** 28 de Julio, 2025
-- **Componente(s) Afectado(s):** `src/App.tsx`, `src/pages/Index.tsx`
-- **Descripción del Problema/Cambio:** Se presentó un bug crítico y persistente donde la UI (botón de admin, modal de bienvenida) se renderizaba de forma inconsistente. A veces los elementos aparecían correctamente y a veces no. La causa raíz era una **condición de carrera**: la aplicación se renderizaba antes de que la llamada asíncrona a Supabase para verificar la sesión del usuario hubiera terminado.
-- **Solución Implementada:** Se re-arquitecturó la gestión de estado siguiendo el patrón de un respaldo funcional. **Se eliminó toda la lógica de estado de `App.tsx`**, convirtiéndolo en un componente simple que solo define rutas. **Toda la responsabilidad de la autenticación** (obtener sesión, manejar estado de carga, verificar si es admin) **se consolidó dentro de `Index.tsx`**. Ahora, `Index.tsx` es autónomo: muestra una pantalla de carga mientras verifica la sesión y solo después renderiza la UI principal, eliminando por completo la condición de carrera.
-- **Desarrollador:** Cascade (asistente de IA)
+Durante el desarrollo, se encontró un error de compilación persistente (`TS2345`) donde TypeScript no reconocía la función RPC `is_admin` como un argumento válido.
 
----
+**Causa:** Los tipos autogenerados por la CLI de Supabase (`supabase gen types`) no se actualizaron correctamente para incluir todas las funciones RPC disponibles, limitando la verificación de tipos a una sola función.
+
+**Solución Implementada:**
+
+Para resolver el bloqueo de compilación, se aplicó una solución controlada en `src/pages/Index.tsx`:
+
+1. **Aserción de Tipo (`as any`):** Se fuerza a TypeScript a ignorar el error de tipado en la llamada `supabase.rpc('is_admin')`.
+2. **Desactivación de ESLint:** Se añade un comentario `// eslint-disable-next-line @typescript-eslint/no-explicit-any` para silenciar la advertencia de calidad de código sobre el uso de `any` en esa línea específica.
+
+```typescript
+// HACK: Using 'as any' to bypass incorrect Supabase type generation.
+// The long-term fix is to regenerate Supabase types correctly.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const { data, error } = await supabase.rpc('is_admin' as any);
+```
+
+**Solución a Largo Plazo:**
+
+Para evitar este problema en el futuro, se debe regenerar el archivo de tipos de Supabase después de cada cambio en el esquema de la base de datos o en las funciones RPC. Ejecuta el siguiente comando:
+
+```bash
+pnpm supabase gen types --local > src/types/supabase.ts
+```
