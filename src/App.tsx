@@ -22,17 +22,25 @@ function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [authReady, setAuthReady] = useState(false);
+  const [minTimePassed, setMinTimePassed] = useState(false);
 
   useEffect(() => {
+    // Timer for minimum loading screen duration
+    const timer = setTimeout(() => {
+      setMinTimePassed(true);
+    }, 1500); // Show loading for at least 1.5 seconds
+
+    // Supabase auth listener
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setIsAdmin(session?.user?.user_metadata?.role === 'admin');
-      setLoading(false); // Auth state is now confirmed, hide loading screen.
+      setAuthReady(true); // Supabase has responded
     });
 
     return () => {
+      clearTimeout(timer);
       authListener.subscription.unsubscribe();
     };
   }, []);
@@ -43,7 +51,7 @@ function App() {
         <Toaster />
         <Sonner />
         <Router>
-          {loading ? (
+          {(!authReady || !minTimePassed) ? (
             <LoadingScreen key="loading" />
           ) : (
             <Routes>

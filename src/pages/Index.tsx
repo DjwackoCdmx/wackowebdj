@@ -98,11 +98,12 @@ export default function Index({ user, isAdmin }: IndexProps) {
   }, [toast]);
 
   useEffect(() => {
+    // Show welcome modal only to new visitors (not logged in)
     const hasSeenModal = localStorage.getItem('hasSeenWelcomeModal');
-    if (!hasSeenModal) {
+    if (!hasSeenModal && !user) {
       setIsWelcomeModalOpen(true);
     }
-  }, []);
+  }, [user]);
 
   const handleCloseWelcomeModal = () => {
     localStorage.setItem('hasSeenWelcomeModal', 'true');
