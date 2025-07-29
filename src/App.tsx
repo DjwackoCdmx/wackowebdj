@@ -22,16 +22,14 @@ function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [authReady, setAuthReady] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setAuthReady(false);
-
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setIsAdmin(session?.user?.user_metadata?.role === 'admin');
-      setAuthReady(true); // This will be called once the initial state is determined.
+      setLoading(false); // Auth state is now confirmed, hide loading screen.
     });
 
     return () => {
@@ -45,7 +43,7 @@ function App() {
         <Toaster />
         <Sonner />
         <Router>
-          {!authReady ? (
+          {loading ? (
             <LoadingScreen key="loading" />
           ) : (
             <Routes>

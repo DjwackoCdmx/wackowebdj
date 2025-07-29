@@ -228,7 +228,7 @@ export default function Index({ user, isAdmin }: IndexProps) {
                 {isAdmin && <Button variant="secondary" onClick={() => navigate('/admin')}>👑 Panel de Admin</Button>}
                 {user && <Button variant="outline" onClick={() => navigate('/history')}> <History className="mr-2 h-4 w-4" /> Historial</Button>}
                 {user ? <Button variant="destructive" onClick={handleSignOut}><LogOut className="mr-2 h-4 w-4" />Cerrar Sesión</Button> : <Button onClick={() => navigate('/auth')}><User className="mr-2 h-4 w-4" />Iniciar Sesión</Button>}
-                <Button onClick={() => document.getElementById('request-section')?.scrollIntoView({ behavior: 'smooth' })}>🎵 Solicitar</Button>
+
                 <a href="https://github.com/DjwackoCdmx/wackowebdj/releases/latest/download/app-release.apk" target="_blank" rel="noopener noreferrer"><Button variant="outline" className="bg-green-500 hover:bg-green-600 text-white"><Download className="mr-2 h-4 w-4" />Descargar APK</Button></a>
               </div>
             </div>
