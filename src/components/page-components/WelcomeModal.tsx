@@ -11,11 +11,24 @@ export const WelcomeModal = ({ isOpen, onClose }: WelcomeModalProps) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="bg-gray-900 text-white border-purple-500">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-purple-400">¡Bienvenido a la Experiencia Musical!</DialogTitle>
-          <DialogDescription className="text-gray-400 pt-2">
-            Aquí puedes solicitar tus canciones favoritas y ser parte del show. Todas las solicitudes se procesan a través de una pequeña propina para el DJ.
-            <br /><br />
-            <strong>¡Disfruta de la música!</strong>
+          <DialogTitle className="text-2xl font-bold text-purple-400">¡Bienvenido a la Plataforma de DJ Wacko!</DialogTitle>
+          <DialogDescription asChild>
+            <div className="text-gray-400 pt-2 text-left space-y-4">
+              <p>
+                Esta es la plataforma interactiva para solicitar canciones durante los sets en vivo.
+              </p>
+              <div>
+                <h3 className="font-bold text-lg mb-2 text-purple-300">¿Cómo funciona?</h3>
+                <ol className="list-decimal list-inside space-y-1">
+                  <li>Rellena el formulario con tu canción favorita.</li>
+                  <li>Apoya al artista con una propina (mínimo $2.00 USD) para enviar tu solicitud.</li>
+                  <li>¡Disfruta de tu canción en el set!</li>
+                </ol>
+              </div>
+              <p>
+                Te recomendamos <strong>iniciar sesión</strong> para guardar tu historial y acceder a tus canciones favoritas rápidamente.
+              </p>
+            </div>
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>

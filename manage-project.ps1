@@ -33,11 +33,20 @@ do {
                 Write-Host "Error durante la sincronización de Capacitor." -ForegroundColor Red
                 break
             }
+
+            Write-Host "Paso 1.5/2: Parcheando versión de Java en capacitor.build.gradle..." -ForegroundColor Yellow
+            $capacitorBuildGradle = ".\android\app\capacitor.build.gradle"
+            if (Test-Path $capacitorBuildGradle) {
+                (Get-Content $capacitorBuildGradle -Raw).Replace('JavaVersion.VERSION_21', 'JavaVersion.VERSION_17') | Set-Content $capacitorBuildGradle
+                Write-Host "Versión de Java corregida a 17." -ForegroundColor Green
+            } else {
+                Write-Host "ADVERTENCIA: No se encontró capacitor.build.gradle para parchear." -ForegroundColor Yellow
+            }
             
             Write-Host "
 Paso 2/2: Limpiando y compilando el APK de depuración..." -ForegroundColor Yellow
             Push-Location -Path .\android
-            .\gradlew.bat clean assembleDebug
+            .\gradlew.bat app:clean app:assembleDebug
             if ($LASTEXITCODE -ne 0) {
                 Write-Host "Error durante la compilación con Gradle." -ForegroundColor Red
             } else {

@@ -22,6 +22,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
 }
 
 repositories {
@@ -43,6 +44,8 @@ dependencies {
 }
 
 apply from: 'capacitor.build.gradle'
+
+
 
 try {
     def servicesJSON = file('google-services.json')

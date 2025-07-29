@@ -6,48 +6,48 @@ Bienvenido a la plataforma interactiva de DJ Wacko. Esta aplicación permite a l
 
 ### Funcionalidades
 
-*   **Solicitudes de Canciones en Tiempo Real:** Envía tus canciones favoritas directamente al DJ durante sus sets en vivo.
-*   **Sistema de Propinas Integrado:** Apoya al artista con una propina al momento de hacer tu solicitud.
-*   **Panel de Administración:** Una vista exclusiva para que el DJ gestione las solicitudes, controle el flujo de la música y visualice el historial.
-*   **Autenticación Segura:** Inicia sesión para guardar tu historial de solicitudes y acceder a funciones personalizadas.
-*   **Diseño Moderno y Responsivo:** Disfruta de una experiencia de usuario fluida en cualquier dispositivo, ya sea de escritorio o móvil.
+* **Solicitudes de Canciones en Tiempo Real:** Envía tus canciones favoritas directamente al DJ durante sus sets en vivo.
+* **Sistema de Propinas Integrado:** Apoya al artista con una propina al momento de hacer tu solicitud.
+* **Panel de Administración:** Una vista exclusiva para que el DJ gestione las solicitudes, controle el flujo de la música y visualice el historial.
+* **Autenticación Segura y Sencilla:** Un flujo de registro e inicio de sesión claro y directo para guardar tu historial y acceder a funciones personalizadas.
+* **Diseño Moderno y Responsivo:** Disfruta de una experiencia de usuario fluida en cualquier dispositivo, ya sea de escritorio o móvil.
 
 ## Tecnologías Utilizadas
 
 ### Frontend
 
-*   **React 18:** Para una interfaz de usuario dinámica y reactiva.
-*   **TypeScript:** Para un código más robusto y seguro.
-*   **Vite:** Como herramienta de construcción y servidor de desarrollo ultrarrápido.
-*   **Tailwind CSS:** Para un diseño estilizado y personalizable.
-*   **shadcn/ui:** Una colección de componentes de UI reutilizables y accesibles.
+* **React 18:** Para una interfaz de usuario dinámica y reactiva.
+* **TypeScript:** Para un código más robusto y seguro.
+* **Vite:** Como herramienta de construcción y servidor de desarrollo ultrarrápido.
+* **Tailwind CSS:** Para un diseño estilizado y personalizable.
+* **shadcn/ui:** Una colección de componentes de UI reutilizables y accesibles.
 
 ### Backend & Base de Datos
 
-*   **Supabase:** La plataforma de backend como servicio que proporciona base de datos, autenticación y APIs.
+* **Supabase:** La plataforma de backend como servicio que proporciona base de datos, autenticación y APIs.
 
 ### Despliegue
 
-*   **Vercel/Netlify:** Plataformas optimizadas para el despliegue de aplicaciones frontend modernas.
+* **Vercel/Netlify:** Plataformas optimizadas para el despliegue de aplicaciones frontend modernas.
 
 ## Cómo Empezar
 
 ### Prerrequisitos
 
-*   Node.js (versión 18 o superior)
-*   npm o pnpm
-*   Una cuenta de Supabase
+* Node.js (versión 18 o superior)
+* npm o pnpm
+* Una cuenta de Supabase
 
 ### Instalación
 
-1.  **Clona el repositorio:**
+1. **Clona el repositorio:**
 
     ```bash
     git clone https://github.com/tu-usuario/Dj_propiona_eb.git
     cd Dj_propiona_eb
     ```
 
-2.  **Instala las dependencias:**
+2. **Instala las dependencias:**
 
     ```bash
     npm install
@@ -55,19 +55,19 @@ Bienvenido a la plataforma interactiva de DJ Wacko. Esta aplicación permite a l
     pnpm install
     ```
 
-3.  **Configura las variables de entorno:**
+3. **Configura las variables de entorno:**
 
-    *   Crea un archivo `.env` en la raíz del proyecto.
-    *   Añade tus claves de Supabase como se muestra en el archivo `.env.example`:
+    * Crea un archivo `.env` en la raíz del proyecto.
+    * Añade tus claves de Supabase como se muestra en el archivo `.env.example`:
 
-        ```
+        ```env
         VITE_SUPABASE_URL=tu-url-de-supabase
         VITE_SUPABASE_ANON_KEY=tu-anon-key-de-supabase
         ```
 
 ### Ejecución
 
-*   **Para desarrollo:**
+* **Para desarrollo:**
 
     ```bash
     npm run dev
@@ -75,7 +75,7 @@ Bienvenido a la plataforma interactiva de DJ Wacko. Esta aplicación permite a l
 
     La aplicación estará disponible en `http://localhost:5173`.
 
-*   **Para producción:**
+* **Para producción:**
 
     ```bash
     npm run build
@@ -84,7 +84,7 @@ Bienvenido a la plataforma interactiva de DJ Wacko. Esta aplicación permite a l
 
 ## Estructura del Proyecto
 
-```
+```text
 Dj_propiona_eb/
 ├── public/           # Archivos estáticos
 ├── src/
@@ -102,16 +102,14 @@ Dj_propiona_eb/
 
 Las contribuciones son bienvenidas. Si deseas mejorar la aplicación, por favor abre un *issue* para discutir los cambios o envía un *pull request*.
 
----
-
 ## REPORTE DE AUDITORÍA
 
 ### RESUMEN EJECUTIVO
 
-*   ✅ **Estado General:** PROYECTO LISTO PARA PRODUCCIÓN
-*   ✅ **Errores Críticos:** CORREGIDOS
-*   ✅ **Compatibilidad:** MEJORADA PARA CHROME Y OTROS NAVEGADORES
-*   ✅ **Componentes UI:** TODOS AUDITADOS Y APROBADOS
+* ✅ **Estado General:** PROYECTO LISTO PARA PRODUCCIÓN
+* ✅ **Errores Críticos:** CORREGIDOS
+* ✅ **Compatibilidad:** MEJORADA PARA CHROME Y OTROS NAVEGADORES
+* ✅ **Componentes UI:** TODOS AUDITADOS Y APROBADOS
 
 ### CONCLUSIÓN
 

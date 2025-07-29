@@ -68,6 +68,28 @@ Dj_propiona_eb/
 
 ---
 
+- **Fecha:** 29 de Julio, 2025
+- **Componente(s) Afectado(s):** `src/pages/Index.tsx`, `src/pages/Auth.tsx`
+- **Descripción del Problema/Cambio:** Se necesitaba mejorar la experiencia de los nuevos usuarios y la accesibilidad de la información de contacto. La página principal solo tenía un botón de "Iniciar Sesión", lo que podía ser confuso para quienes deseaban registrarse. Además, la información de contacto (WhatsApp, Twitter) no estaba visible.
+- **Solución Implementada:**
+  1.  En `Index.tsx`, se reemplazó el botón único por dos botones distintos: "Iniciar Sesión" y "Registrarse".
+  2.  Se añadió una sección de contacto prominente con enlaces directos a WhatsApp y Twitter, utilizando iconos para mejorar la visibilidad.
+  3.  En `Auth.tsx`, se implementó lógica para detectar el estado de navegación, permitiendo que el clic en "Registrarse" lleve directamente al formulario de registro, creando un flujo de usuario más intuitivo.
+- **Desarrollador:** Cascade (asistente de IA)
+
+---
+
+- **Fecha:** 29 de Julio, 2025
+- **Componente(s) Afectado(s):** `src/pages/Index.tsx`, `src/pages/Auth.tsx`
+- **Descripción del Problema/Cambio:** Se necesitaba mejorar la experiencia de los nuevos usuarios y la accesibilidad de la información de contacto. La página principal solo tenía un botón de "Iniciar Sesión", lo que podía ser confuso para quienes deseaban registrarse. Además, la información de contacto (WhatsApp, Twitter) no estaba visible.
+- **Solución Implementada:**
+  1.  En `Index.tsx`, se reemplazó el botón único por dos botones distintos: "Iniciar Sesión" y "Registrarse".
+  2.  Se añadió una sección de contacto prominente con enlaces directos a WhatsApp y Twitter, utilizando iconos para mejorar la visibilidad.
+  3.  En `Auth.tsx`, se implementó lógica para detectar el estado de navegación, permitiendo que el clic en "Registrarse" lleve directamente al formulario de registro, creando un flujo de usuario más intuitivo.
+- **Desarrollador:** Cascade (asistente de IA)
+
+---
+
 - **Fecha:** 28 de Julio, 2025
 - **Componente(s) Afectado(s):** `src/App.tsx`, `src/pages/Index.tsx`
 - **Descripción del Problema/Cambio:** Se presentó un bug crítico y persistente donde la UI (botón de admin, modal de bienvenida) se renderizaba de forma inconsistente. A veces los elementos aparecían correctamente y a veces no. La causa raíz era una **condición de carrera**: la aplicación se renderizaba antes de que la llamada asíncrona a Supabase para verificar la sesión del usuario hubiera terminado.

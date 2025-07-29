@@ -19,13 +19,14 @@ export interface SongRequestFormData {
 }
 
 interface SongRequestFormProps {
-  isRequestTimeAllowed: boolean;
-  scheduleMessage: string;
-  onSubmit: (formData: SongRequestFormData, customGenre: string) => void;
+  onSubmit: (formData: SongRequestFormData) => void;
   isSubmitting: boolean;
+  isRequestTimeAllowed: boolean;
+  genres: string[];
 }
 
-export const SongRequestForm = ({ isRequestTimeAllowed, scheduleMessage, onSubmit, isSubmitting }: SongRequestFormProps) => {
+export const SongRequestForm = ({ onSubmit, isSubmitting, isRequestTimeAllowed, genres }: SongRequestFormProps) => {
+  const scheduleMessage = "El DJ no está aceptando solicitudes en este momento. Por favor, vuelve a intentarlo más tarde.";
   const [formData, setFormData] = useState<SongRequestFormData>({
     songName: "",
     artistName: "",
@@ -66,15 +67,15 @@ export const SongRequestForm = ({ isRequestTimeAllowed, scheduleMessage, onSubmi
         return;
     }
     setError(null);
-    onSubmit(formData, customGenre);
+    onSubmit({ ...formData, genre: formData.genre === 'otro' ? customGenre : formData.genre });
   };
 
   return (
-    <Card className="w-full bg-black/50 border-purple-400/30 text-white backdrop-blur-sm">
+    <Card className="w-full max-w-2xl bg-black/50 border-purple-400/30 text-white backdrop-blur-sm animate-fade-in-up">
       <form onSubmit={handleSubmit}>
         <CardHeader>
-          <CardTitle className="text-2xl font-bold tracking-wider text-purple-300">Solicita tu Canción</CardTitle>
-          <CardDescription className="text-gray-400">Rellena el formulario para enviar tu solicitud de canción al DJ.</CardDescription>
+          <CardTitle className="text-3xl font-bold tracking-wider text-white">Solicita tu Canción</CardTitle>
+          <CardDescription className="text-white/70 pt-1">Rellena el formulario para enviar tu solicitud de canción al DJ.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {!isRequestTimeAllowed && (
@@ -102,12 +103,7 @@ export const SongRequestForm = ({ isRequestTimeAllowed, scheduleMessage, onSubmi
               </SelectTrigger>
               <SelectContent>
                 {
-                  [
-                    "Reggaeton", "Techno", "House", "Electro", "EDM", "Hip-Hop", "Trap", 
-                    "Pop", "Rock", "Cumbia", "Salsa", "Bachata", "Merengue", "Regional Mexicano",
-                    "Funk", "Disco", "Trance", "Dubstep", "Drum & Bass", "Ambient", "Progressive",
-                    "Deep House", "Tech House", "Minimal", "Banda", "Circuit", "Otro"
-                  ].map(genre => (
+                  genres.map(genre => (
                     <SelectItem key={genre} value={genre.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}>
                       {genre}
                     </SelectItem>

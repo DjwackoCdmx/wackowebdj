@@ -4,7 +4,7 @@ import { User as SupabaseUser } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { Crown, Heart, User, History, Clock, LogOut } from 'lucide-react';
+import { Crown, Heart, User, History, Clock, LogOut, UserPlus, Phone, Twitter } from 'lucide-react';
 
 // Import page components from barrel file
 import { SongRequestForm, type SongRequestFormData, WelcomeModal, PaymentDialog } from "@/components/page-components";
@@ -31,7 +31,8 @@ const Index = () => {
 
   const checkAdminStatus = useCallback(async (userId: string) => {
     try {
-      const { data, error } = await supabase.rpc<boolean>('is_admin', { p_user_id: userId });
+            // @ts-expect-error - RPC type generation issue
+      const { data, error } = await supabase.rpc('is_admin', { p_user_id: userId });
       if (error) throw error;
       setIsAdmin(data ?? false);
     } catch (error) {
@@ -42,14 +43,15 @@ const Index = () => {
 
   const checkRequestTime = useCallback(async () => {
     try {
-      const { data, error } = await supabase.rpc<boolean>('is_request_time_allowed');
+      const { data, error } = await supabase.rpc('is_request_time_allowed');
       if (error) throw error;
       setIsRequestTimeAllowed(data ?? true); // Default to true if data is null
 
       if (!data) {
-        const { data: messageData, error: messageError } = await supabase.rpc<string>('get_schedule_message');
+                // @ts-expect-error - RPC type generation issue
+        const { data: messageData, error: messageError } = await supabase.rpc('get_schedule_message');
         if (messageError) throw messageError;
-        setScheduleMessage(messageData || "Las solicitudes están cerradas fuera del horario establecido.");
+        setScheduleMessage(String(messageData ?? "Las solicitudes están cerradas fuera del horario establecido."));
       }
     } catch (error) {
       console.error("Error checking request time:", error);
@@ -166,7 +168,10 @@ const Index = () => {
           <header className="flex justify-between items-center mb-12">
             <div className="flex items-center gap-4">
                 <img src={djWackoMainLogo} alt="DJ Wacko Logo" className="w-16 h-16 rounded-full object-cover border-2 border-primary/50" />
-                <h1 className="text-3xl font-bold text-white tracking-wider">DJ WACKO</h1>
+                <div>
+                  <h1 className="text-3xl font-bold text-white tracking-wider">DJ WACKO</h1>
+                  <p className="text-sm text-foreground/70 -mt-1">Plataforma de Solicitudes Musicales</p>
+                </div>
             </div>
             <nav className="flex items-center gap-2">
               {user && isAdmin && (
@@ -186,15 +191,40 @@ const Index = () => {
                   </Button>
                 </div>
               ) : (
-                <Button variant="outline" onClick={() => navigate('/auth')}>
-                  <User className="w-4 h-4 mr-2" />
-                  Iniciar Sesión
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" onClick={() => navigate('/auth')}>
+                    <User className="w-4 h-4 mr-2" />
+                    Iniciar Sesión
+                  </Button>
+                  <Button variant="secondary" onClick={() => navigate('/auth', { state: { view: 'register' } })}>
+                    <UserPlus className="w-4 h-4 mr-2" />
+                    Registrarse
+                  </Button>
+                </div>
               )}
             </nav>
           </header>
 
           <div className="text-center mb-12">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+              <a 
+                href="https://wa.me/5256441274646" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-4 py-2 bg-green-600/20 text-green-400 rounded-lg hover:bg-green-600/30 transition-all duration-300"
+              >
+                <Phone className="w-4 h-4" /> +52 56 4412 7464
+              </a>
+              <a 
+                href="https://twitter.com/DjwackoCDMX" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600/20 text-blue-400 rounded-lg hover:bg-blue-600/30 transition-all duration-300"
+              >
+                <Twitter className="w-4 h-4" /> @DjwackoCDMX
+              </a>
+            </div>
+
             {!isRequestTimeAllowed && (
               <div className="mb-8 p-4 bg-yellow-600/20 border border-yellow-600/30 rounded-lg animate-fade-in">
                 <div className="flex items-center justify-center gap-2 text-yellow-400">

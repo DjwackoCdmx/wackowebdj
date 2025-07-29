@@ -1,26 +1,14 @@
-export interface SongRequest {
-  id: string;
-  song_name: string;
-  artist_name: string;
-  genre?: string;
-  tip_amount: number;
-  requester_name?: string;
-  telegram_username?: string;
-  created_at: string;
-  payment_status: string;
-  played_status: string;
-  played_at?: string;
-  user_id?: string;
-}
+import type { Database } from './database.types';
 
-export interface UserProfile {
-  id: string;
-  user_id: string;
-  name: string;
-  email: string;
-  nickname: string;
-  phone: string;
-  created_at: string;
-  updated_at: string;
-  is_online?: boolean;
-}
+// Extrayendo los tipos de las tablas de Supabase para mantenerlos sincronizados.
+// Esto nos da type-safety basado en el esquema real de la base de datos.
+
+/**
+ * Perfil de usuario, directamente del esquema de la tabla `user_profiles`.
+ */
+export type UserProfile = Database['public']['Tables']['user_profiles']['Row'];
+
+/**
+ * Solicitud de canción, directamente del esquema de la tabla `song_requests`.
+ */
+export type SongRequest = Database['public']['Tables']['song_requests']['Row'];

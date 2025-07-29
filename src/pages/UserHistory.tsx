@@ -166,6 +166,19 @@ const UserHistory = () => {
     });
   };
 
+  const handleReorder = (request: UserSongRequest) => {
+    navigate("/", {
+      state: {
+        prefilledData: {
+          songName: request.song_name,
+          artistName: request.artist_name,
+          genre: request.genre || "",
+          tipAmount: request.tip_amount.toString(),
+        }
+      }
+    });
+  };
+
   const getStatusBadge = (paymentStatus: string, playedStatus: string) => {
     if (playedStatus === "completed") {
       return <Badge className="bg-green-500 text-white">Reproducida</Badge>;
