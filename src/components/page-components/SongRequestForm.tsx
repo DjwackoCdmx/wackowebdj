@@ -4,11 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Send, HeartHandshake } from 'lucide-react';
+import { HeartHandshake, ListChecks, Send, Terminal } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Terminal } from "lucide-react";
 
 export interface SongRequestFormData {
   songName: string;
@@ -100,7 +99,7 @@ export const SongRequestForm = ({ onSubmit, isSubmitting, isRequestTimeAllowed, 
             <Label htmlFor="genre">Género Musical</Label>
             <Select onValueChange={handleGenreChange} disabled={!isRequestTimeAllowed}>
               <SelectTrigger>
-                <SelectValue placeholder="2. Selecciona tu método de pago (Stripe/Cripto)." />
+                <SelectValue placeholder="Selecciona un género musical" />
               </SelectTrigger>
               <SelectContent>
                 {
@@ -129,10 +128,19 @@ export const SongRequestForm = ({ onSubmit, isSubmitting, isRequestTimeAllowed, 
                 <Input id="telegram" placeholder="@tuUsuario" disabled={!isRequestTimeAllowed} value={formData.telegram} onChange={handleChange} />
             </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="tip" className="flex items-center"><HeartHandshake className="mr-2 h-4 w-4 text-pink-400"/> Muestra tu apoyo (USD) *</Label>
+          <div className="mt-4">
+            <Label htmlFor="tip" className="flex items-center text-lg font-semibold mb-2 text-white"><HeartHandshake className="mr-2 text-pink-400"/> Muestra tu apoyo (USD) *</Label>
             <Input id="tip" type="number" placeholder="$ 2.00" required min="2" disabled={!isRequestTimeAllowed} value={formData.tip} onChange={handleChange} />
-<p className="text-xs text-muted-foreground pt-1">Desde $2.00 USD - Pequeño gesto que hace posible priorizar tu canción ✨</p>
+            <p className="text-xs text-muted-foreground pt-1">Desde $2.00 USD - Pequeño gesto que hace posible priorizar tu canción ✨</p>
+          </div>
+
+          <div className="mt-6 text-left max-w-md mx-auto">
+            <h3 className="text-lg font-semibold text-white mb-3 flex items-center justify-center"><ListChecks className="mr-2"/> Próximos pasos:</h3>
+            <ol className="list-decimal list-inside space-y-2 text-gray-400">
+              <li>Completa el formulario y asegúrate de aceptar los términos y condiciones.</li>
+              <li>Tu solicitud aparecerá en la lista de espera para que DJ Wacko la vea.</li>
+              <li>¡Disfruta de tu canción cuando suene en el set!</li>
+            </ol>
           </div>
           {error && <p className="text-red-500 text-sm">{error}</p>}
           <div className="flex items-center space-x-2">

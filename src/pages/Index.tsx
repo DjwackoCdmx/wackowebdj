@@ -4,7 +4,7 @@ import { User as SupabaseUser } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { Crown, Heart, User, History, Clock, LogOut, UserPlus, Phone, Twitter, ListChecks, MessageCircle, Send } from 'lucide-react';
+import { Crown, Heart, User, History, Clock, LogOut, UserPlus, Phone, Twitter, ListChecks, MessageCircle, Send, Download } from 'lucide-react';
 
 // Import page components from barrel file
 import { SongRequestForm, type SongRequestFormData, WelcomeModal, PaymentDialog } from "@/components/page-components";
@@ -168,15 +168,7 @@ const Index = () => {
           <header className="flex justify-between items-center mb-12">
             <div className="flex items-center gap-4">
                 <img src={djWackoMainLogo} alt="DJ Wacko Logo" className="w-16 h-16 rounded-full object-cover border-2 border-primary/50" />
-                <div>
-                  <h3 className="text-lg font-semibold mb-4 text-white flex items-center"><ListChecks className="mr-2 h-5 w-5 text-purple-400"/>Próximos pasos:</h3>
-                  <ol className="space-y-2 text-gray-300">
-                    <li className="flex items-start"><span className="text-purple-400 font-bold mr-2">1.</span> Completa el formulario y acepta los términos.</li>
-                    <li className="flex items-start"><span className="text-purple-400 font-bold mr-2">2.</span> Selecciona método de pago (Stripe/Cripto).</li>
-                    <li className="flex items-start"><span className="text-purple-400 font-bold mr-2">3.</span> Confirma tu pago.</li>
-                    <li className="flex items-start"><span className="text-purple-400 font-bold mr-2">4.</span> ¡Espera confirmación cuando tu canción suene!</li>
-                  </ol>
-                </div>
+
             </div>
             <nav className="flex items-center gap-2">
               {user && isAdmin && (
@@ -186,7 +178,8 @@ const Index = () => {
                   </Button>
               )}
               {user ? (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-4">
+                  <span className="text-sm text-gray-300 hidden sm:block">{user.email}</span>
                   <Button variant="outline" onClick={() => navigate('/user-history')} size="sm">
                     <History className="w-4 h-4 mr-2" />
                     Mi Historial
@@ -197,68 +190,60 @@ const Index = () => {
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" onClick={() => navigate('/auth')}>
-                    <User className="w-4 h-4 mr-2" />
-                    Iniciar Sesión
-                  </Button>
-                  <Button variant="secondary" onClick={() => navigate('/auth', { state: { view: 'register' } })}>
-                    <UserPlus className="w-4 h-4 mr-2" />
-                    Registrarse
-                  </Button>
+                   <Button variant="outline" onClick={() => navigate('/auth')}>
+                     <User className="w-4 h-4 mr-2" />
+                     Iniciar Sesión
+                   </Button>
+                   <Button onClick={() => navigate('/auth', { state: { from: 'register' } })}>
+                     <UserPlus className="w-4 h-4 mr-2" />
+                     Registrarse
+                   </Button>
                 </div>
               )}
             </nav>
           </header>
 
-          <div className="text-center mb-12">
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-              <a 
-                href="https://wa.me/5256441274646" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-4 py-2 bg-green-600/20 text-green-400 rounded-lg hover:bg-green-600/30 transition-all duration-300"
-              >
-                <Phone className="w-4 h-4" /> +52 56 4412 7464
-              </a>
-              <a 
-                href="https://twitter.com/DjwackoCDMX" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600/20 text-blue-400 rounded-lg hover:bg-blue-600/30 transition-all duration-300"
-              >
-                <Twitter className="w-4 h-4" /> @DjwackoCDMX
-              </a>
-              <a href="https://wa.me/5215512345678" target="_blank" rel="noopener noreferrer" className="bg-black/30 p-4 rounded-lg flex items-center justify-center space-x-2 hover:bg-white/20 transition-colors">
-                <MessageCircle className="h-5 w-5 mr-2 text-green-400" />
-                <span>Contrataciones (WhatsApp)</span>
-              </a>
-            </div>
-
-            {!isRequestTimeAllowed && (
-              <div className="mt-8 p-6 border border-white/10 rounded-lg bg-black/30 backdrop-blur-sm">
-                <div className="flex items-center justify-center gap-2 text-yellow-400">
-                  <Clock className="w-5 h-5" />
-                  <span className="font-medium">{scheduleMessage}</span>
-                </div>
-              </div>
-            )}
-            <div className="flex items-center justify-center gap-2 mb-8 animate-fade-in" style={{ animationDelay: '0.6s' }}>
-              <Heart className="w-5 h-5 text-neon-pink animate-pulse" />
-              <h1 className="text-5xl md:text-7xl font-black text-white uppercase tracking-wider animate-fade-in-up">
-                DJ Wacko
+          <main className="flex-grow flex flex-col items-center justify-center text-center p-4">
+            <div className="bg-black bg-opacity-50 p-8 rounded-xl shadow-2xl max-w-3xl w-full">
+              <h1 className="text-5xl font-extrabold tracking-tight mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500">
+                Tu Música, Tu Momento
               </h1>
-              <Heart className="w-5 h-5 text-neon-pink animate-pulse" />
-            </div>
-          </div>
-
-          <main className="relative z-10 flex items-center justify-center">
-            <SongRequestForm 
+              <h2 className="text-4xl font-black text-white uppercase tracking-wider mb-4">DJ WACKO</h2>
+              <p className="text-xl text-gray-300 mb-8">
+                Solicita tus canciones preferidas y disfrútalas en la fiesta.
+              </p>
+              
+              <SongRequestForm 
                 onSubmit={handleFormSubmit} 
                 isSubmitting={isSubmitting} 
                 isRequestTimeAllowed={isRequestTimeAllowed}
                 genres={['Rock', 'Pop', '80s', '90s', 'Electrónica', 'Reggaeton', 'Otro']}
               />
+            </div>
           </main>
+
+          <footer className="w-full p-4 bg-black bg-opacity-30 mt-12">
+            <div className="max-w-4xl mx-auto text-center">
+              <h3 className="text-lg font-semibold text-white mb-3"><MessageCircle className="inline-block mr-2"/> Contacto y Descargas</h3>
+              <div className="flex justify-center items-center gap-4">
+                <Button asChild variant="outline" className="bg-green-500/10 border-green-500/30 text-white hover:bg-green-500/20">
+                  <a href="https://wa.me/5256441274646" target="_blank" rel="noopener noreferrer">
+                    <Phone className="mr-2 h-4 w-4" /> WhatsApp
+                  </a>
+                </Button>
+                <Button asChild variant="outline" className="bg-blue-500/10 border-blue-500/30 text-white hover:bg-blue-500/20">
+                  <a href="https://twitter.com/DjwackoCDMX" target="_blank" rel="noopener noreferrer">
+                    <Twitter className="mr-2 h-4 w-4" /> Twitter
+                  </a>
+                </Button>
+                <Button asChild className="bg-purple-600 hover:bg-purple-700 text-white font-bold">
+                  <a href="https://github.com/DjwackoCdmx/wackowebdj/releases/download/v1.0.0/app-release.apk" download>
+                    <Download className="mr-2 h-4 w-4" /> Descargar APK
+                  </a>
+                </Button>
+              </div>
+            </div>
+          </footer>
         </div>
       </div>
     </>
