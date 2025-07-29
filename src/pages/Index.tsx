@@ -98,25 +98,7 @@ const Index = ({ appState, onWelcomeAccept }: IndexProps) => {
       setSession(session);
       const currentUser = session?.user ?? null;
       setUser(currentUser);
-
-      if (currentUser) {
-        try {
-          const { data: userProfile, error } = await supabase
-            .from('user_profiles')
-            .select('is_admin')
-            .eq('id', currentUser.id)
-            .single();
-
-          if (error) throw error;
-
-          setIsAdmin(userProfile?.is_admin || false);
-        } catch (error) {
-          console.error('Error fetching user role:', error);
-          setIsAdmin(false);
-        }
-      } else {
-        setIsAdmin(false);
-      }
+      setIsAdmin(!!session);
     });
 
     return () => {
@@ -206,7 +188,17 @@ const Index = ({ appState, onWelcomeAccept }: IndexProps) => {
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
       <WelcomeModal open={showWelcomeModal} onAccept={handleCloseWelcomeModal} />
-      <div className="absolute inset-0 h-full w-full bg-slate-950 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${djHeroBg})` }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-background/90 via-background/70 to-background/90" />
+      </div>
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-neon rounded-full blur-3xl opacity-20 animate-pulse" />
+        <div className="absolute bottom-20 right-10 w-40 h-40 bg-gradient-electric rounded-full blur-3xl opacity-20 animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-primary rounded-full blur-3xl opacity-10 animate-pulse" style={{ animationDelay: '2s' }} />
+      </div>
       <div className="relative container mx-auto px-4 z-10">
         {!isReady ? (
           <div className="flex justify-center items-center min-h-screen">
@@ -239,8 +231,12 @@ const Index = ({ appState, onWelcomeAccept }: IndexProps) => {
 
               {/* Social Media Links Restored */}
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6 mb-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-                <a href="https://wa.me/5256441274646" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 bg-green-600/20 text-green-400 rounded-lg hover:bg-green-600/30 transition-all duration-300 hover-scale">📱 +52 56 4412 7464</a>
-                <a href="https://twitter.com/DjwackoCDMX" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 bg-blue-600/20 text-blue-400 rounded-lg hover:bg-blue-600/30 transition-all duration-300 hover-scale">🐦 @DjwackoCDMX</a>
+                <a href="https://wa.me/5256441274646" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 bg-green-600/20 text-green-400 rounded-lg hover:bg-green-600/30 transition-all duration-300 hover-scale">
+                  <MessageCircle className="w-5 h-5" /> Contrataciones
+                </a>
+                <a href="https://twitter.com/DjwackoCDMX" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 bg-blue-600/20 text-blue-400 rounded-lg hover:bg-blue-600/30 transition-all duration-300 hover-scale">
+                  <Twitter className="w-5 h-5" /> Sígueme
+                </a>
               </div>
             </main>
 
@@ -262,13 +258,13 @@ const Index = ({ appState, onWelcomeAccept }: IndexProps) => {
                   </CardHeader>
                   <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-6">
-                      <div className="space-y-2"><Label htmlFor="songName">Nombre de la canción *</Label><Input id="songName" value={formData.songName} onChange={(e) => setFormData({ ...formData, songName: e.target.value })} required /></div>
-                      <div className="space-y-2"><Label htmlFor="artistName">Artista *</Label><Input id="artistName" value={formData.artistName} onChange={(e) => setFormData({ ...formData, artistName: e.target.value })} required /></div>
+                      <div className="space-y-2 animate-fade-in" style={{ animationDelay: '0.8s' }}><Label htmlFor="songName" className="text-sm font-medium text-foreground">🎵 Nombre de la canción *</Label><Input id="songName" placeholder="Ej: Gasolina" value={formData.songName} onChange={(e) => setFormData({ ...formData, songName: e.target.value })} className="bg-background/50 border-primary/30 focus:border-primary focus:scale-105 transition-all duration-300" required /></div>
+                      <div className="space-y-2 animate-fade-in" style={{ animationDelay: '1s' }}><Label htmlFor="artistName" className="text-sm font-medium text-foreground">👨‍🎤 Artista *</Label><Input id="artistName" placeholder="Ej: Daddy Yankee" value={formData.artistName} onChange={(e) => setFormData({ ...formData, artistName: e.target.value })} className="bg-background/50 border-primary/30 focus:border-primary focus:scale-105 transition-all duration-300" required /></div>
                       <div className="space-y-2"><Label htmlFor="requesterName">Tu nombre *</Label><Input id="requesterName" value={formData.requesterName} onChange={(e) => setFormData({ ...formData, requesterName: e.target.value })} required /></div>
                       <div className="space-y-2"><Label htmlFor="genre">Género musical</Label><Select onValueChange={(value) => setFormData({ ...formData, genre: value })} value={formData.genre}><SelectTrigger><SelectValue placeholder="Selecciona un género" /></SelectTrigger><SelectContent>{musicGenres.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}</SelectContent></Select></div>
                       <div className="space-y-2"><Label htmlFor="tip">Propina (USD)</Label><Input id="tip" type="number" min="2.00" step="0.50" value={formData.tip} onChange={(e) => setFormData({ ...formData, tip: e.target.value })} /></div>
                       <div className="flex items-center space-x-2"><Checkbox id="terms" checked={acceptedTerms} onCheckedChange={(c) => setAcceptedTerms(c as boolean)} /><label htmlFor="terms" className="text-sm leading-none">Acepto los <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline">términos y condiciones</a></label></div>
-                      <Button type="submit" disabled={isSubmitting || !acceptedTerms} className="w-full">{isSubmitting ? 'Enviando...' : 'Enviar Solicitud'}</Button>
+                      <Button type="submit" disabled={isSubmitting || !acceptedTerms} className="w-full bg-gradient-to-r from-purple-600 to-pink-500 text-white font-bold text-lg h-12 hover:scale-105 transition-transform duration-300">{isSubmitting ? 'Enviando...' : 'Enviar Solicitud'}</Button>
                     </form>
                   </CardContent>
                 </Card>
