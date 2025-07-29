@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { History, LogOut, Music } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
-import djWackoMainLogo from '@/assets/img/dj_wacko_main_logo.jpg';
+import djWackoMainLogo from '@/assets/dj-wacko-main-logo.gif';
 
 interface HeaderProps {
   user: User | null;

@@ -8,7 +8,7 @@ import { Toaster, toast } from "sonner";
 import { Header } from "@/components/layout/Header";
 import { MainContent } from "@/components/page-components/MainContent";
 import { Footer } from "@/components/layout/Footer";
-import backgroundImage from '@/assets/img/background_001.jpg';
+import backgroundImage from '@/assets/dj-hero-bg.jpg';
 
 interface SongFormData {
   songName: string;
