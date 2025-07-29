@@ -1,6 +1,6 @@
 import { SongRequestForm } from "@/components/page-components/SongRequestForm";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Phone, Twitter } from 'lucide-react';
+import { MessageCircle, Phone, Twitter, Download } from 'lucide-react';
 
 interface SongFormData {
   songName: string;
@@ -34,8 +34,8 @@ export const MainContent = ({ onSubmit, isSubmitting, isRequestTimeAllowed }: Ma
             genres={['Rock', 'Pop', '80s', '90s', 'Electrónica', 'Reggaeton', 'Otro']}
           />
         </div>
-        <div className="mt-8 pt-6 border-t border-gray-700/50 flex flex-col sm:flex-row justify-center items-center gap-4">
-            <p className="text-gray-300">¿Necesitas contactarme directamente?</p>
+        <div className="mt-8 pt-6 border-t border-gray-700/50 flex flex-wrap justify-center items-center gap-4">
+            <p className="text-gray-300 w-full sm:w-auto mb-4 sm:mb-0">Contacto y Descargas:</p>
             <Button asChild variant="electric">
                 <a href="https://t.me/djwacko" target="_blank" rel="noopener noreferrer">
                     <MessageCircle className="mr-2 h-4 w-4" /> Telegram
@@ -49,6 +49,11 @@ export const MainContent = ({ onSubmit, isSubmitting, isRequestTimeAllowed }: Ma
             <Button asChild className="bg-blue-500 hover:bg-blue-600 text-white">
                 <a href="http://x.com/DjWackoCDMX" target="_blank" rel="noopener noreferrer">
                     <Twitter className="mr-2 h-4 w-4" /> Twitter
+                </a>
+            </Button>
+            <Button asChild className="bg-indigo-600 hover:bg-indigo-700 text-white">
+                <a href="https://github.com/DjwackoCdmx/wackowebdj/releases/download/v1.0.0/app-release.apk" target="_blank" rel="noopener noreferrer">
+                    <Download className="mr-2 h-4 w-4" /> Descargar APK
                 </a>
             </Button>
         </div>

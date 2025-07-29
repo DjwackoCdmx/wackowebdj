@@ -25,7 +25,7 @@ const AppWrapper = () => {
     // Simulate app loading
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 2000); // 2-second delay for demo
+    }, 3500); // 3.5-second delay
 
     return () => clearTimeout(timer);
   }, []);

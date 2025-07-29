@@ -1,5 +1,51 @@
 # Guía para Desarrolladores - Plataforma DJ Wacko
 
+Esta guía documenta la estructura del proyecto, las decisiones clave de desarrollo y los procedimientos para mantener y extender la aplicación.
+
+## 1. Estructura de Carpetas Clave
+
+El proyecto sigue una estructura organizada para separar las preocupaciones y facilitar la mantenibilidad.
+
+-   `src/`
+    -   `assets/`: Imágenes, GIFs y otros recursos estáticos.
+    -   `components/`: Componentes de React reutilizables.
+        -   `ui/`: Componentes base de ShadCN (Button, Card, etc.). **No modificar directamente.**
+        -   `layout/`: Componentes estructurales (Header, Footer, LoadingScreen, ProtectedRoute).
+        -   `page-components/`: Componentes complejos específicos de una página (e.g., `SongRequestForm`, `WelcomeModal`).
+        -   `admin-components/`: Componentes exclusivos para el panel de administración. (Carpeta `admin` fue consolidada aquí).
+        -   `auth-components/`: Componentes para las páginas de autenticación.
+    -   `hooks/`: Hooks de React personalizados (e.g., `use-toast`).
+    -   `integrations/`: Clientes y configuraciones para servicios externos (e.g., Supabase).
+    -   `pages/`: Componentes que representan páginas completas y se asocian a rutas.
+    -   `types/`: Definiciones de tipos de TypeScript globales.
+-   `supabase/`
+    -   `functions/`: Funciones Edge de Supabase escritas en Deno.
+
+## 2. Configuración del Entorno de Desarrollo
+
+### Prerrequisitos
+-   Node.js (v18+)
+-   pnpm (o npm/yarn)
+-   Extensión de VS Code: `Tailwind CSS IntelliSense`
+-   Extensión de VS Code: `Deno`
+
+### Configuración de VS Code (`.vscode/settings.json`)
+
+Para asegurar que el editor de código entienda tanto la sintaxis de Tailwind CSS como la de Deno (para las funciones de Supabase), el archivo `.vscode/settings.json` ha sido configurado para habilitar el linter de Deno específicamente en la carpeta `supabase/functions`. Esto resuelve los errores de importación de módulos por URL y el reconocimiento de APIs de Deno.
+
+## 3. Resumen de Cambios Recientes (Julio 2025)
+
+Se realizó una sesión de estabilización y refactorización que abordó los siguientes puntos:
+
+-   **Refactorización de Carpetas:** Se consolidó la carpeta duplicada `src/components/admin` dentro de `src/components/admin-components` para mantener una estructura de proyecto limpia y consistente.
+-   **Corrección de Rutas:** Se verificó y completó el enrutador principal en `App.tsx`, asegurando que todas las páginas, incluida la ruta protegida `/admin`, estén correctamente registradas.
+-   **Solución de Bugs de UI:**
+    -   Se eliminó el contenido duplicado en la página principal (`Index.tsx`).
+    -   Se corrigió la ruta de la imagen rota en el modal de bienvenida (`WelcomeModal.tsx`).
+    -   Se solucionó la advertencia de `key` duplicada en el formulario de solicitud de canciones (`SongRequestForm.tsx`).
+    -   Se habilitó el enlace a "Términos y Condiciones" registrando su ruta.
+-   **Configuración del Editor:** Se ajustó `settings.json` para proporcionar IntelliSense correcto para las funciones de Supabase (Deno), eliminando falsos positivos de errores de TypeScript.
+
 Este documento contiene toda la información técnica necesaria para entender, mantener y extender el proyecto.
 
 ## 🚀 Pila Tecnológica (Tech Stack)

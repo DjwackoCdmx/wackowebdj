@@ -2,7 +2,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import RequestList from './RequestList';
 import HistoryList from './HistoryList';
 import OnlineUsersList from './OnlineUsersList';
-import AnalyticsDashboard from '@/components/admin/AnalyticsDashboard';
+import AnalyticsDashboard from './AnalyticsDashboard';
 import type { SongRequest, UserProfile } from '@/types';
 
 interface AdminDashboardProps {

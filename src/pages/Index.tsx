@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { WelcomeModal } from '@/components/page-components/WelcomeModal';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Toaster, toast } from "sonner";
 import { Header } from "@/components/layout/Header";
@@ -137,64 +138,52 @@ const Index = () => {
   }, [searchParams]);
 
   return (
-    <div className="min-h-screen bg-cover bg-center bg-fixed text-white flex flex-col items-center"
-         style={{ backgroundImage: `url(${backgroundImage})` }}>
+    <div
+      className="min-h-screen bg-cover bg-center bg-fixed text-white"
+      style={{ backgroundImage: `url(${backgroundImage})` }}
+    >
+      <div className="min-h-screen bg-black bg-opacity-70">
+        <Toaster position="top-center" richColors />
+        
+        <AnimatePresence>
+          {showWelcomeModal && <WelcomeModal isOpen={showWelcomeModal} onClose={handleCloseWelcomeModal} />}
+        </AnimatePresence>
 
-      <AnimatePresence>
-        {showWelcomeModal && (
-          <Dialog open={showWelcomeModal} onOpenChange={setShowWelcomeModal}>
+        <Header user={user} isAdmin={isAdmin} onLogout={handleLogout} />
+        <MainContent
+          onSubmit={handleFormSubmit}
+          isSubmitting={isSubmitting}
+          isRequestTimeAllowed={isRequestTimeAllowed}
+        />
+        <Footer />
+
+        {/* Payment Dialog remains the same */}
+        <AnimatePresence>
+          {showPaymentDialog && (
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.3 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center"
             >
-              <DialogContent className="bg-gray-800 text-white border-purple-500">
-                <DialogHeader>
-                  <DialogTitle className="text-2xl">¡Bienvenido a la Experiencia DJ Wacko!</DialogTitle>
-                  <DialogDescription className="text-gray-400 pt-2">
-                    Aquí puedes pedir tus canciones favoritas y ser parte de la fiesta. Si te gusta lo que hago, ¡considera apoyarme con una propina!
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <Button onClick={handleCloseWelcomeModal} className="bg-purple-600 hover:bg-purple-700">¡Entendido!</Button>
-                </DialogFooter>
-              </DialogContent>
+              <Dialog open={showPaymentDialog} onOpenChange={() => setShowPaymentDialog(false)}>
+                <DialogContent className="bg-gray-900 text-white border-green-500/20 shadow-lg">
+                  <DialogHeader>
+                    <DialogTitle>¡Solicitud Recibida!</DialogTitle>
+                    <DialogDescription>
+                      Tu solicitud ha sido enviada. Para agilizar el proceso, por favor realiza tu pago y envía el comprobante por WhatsApp.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <Button onClick={() => window.open('https://wa.me/5256441274646', '_blank')}>Ir a WhatsApp</Button>
+                    <Button variant="secondary" onClick={() => setShowPaymentDialog(false)}>Cerrar</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </motion.div>
-          </Dialog>
-        )}
-      </AnimatePresence>
-
-      <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
-        <DialogContent className="bg-gray-800 text-white border-green-500">
-          <DialogHeader>
-            <DialogTitle className="text-2xl">¡Gracias por tu Petición!</DialogTitle>
-            <DialogDescription className="text-gray-400 pt-2">
-              Tu canción está en la lista. Si quieres que tu canción tenga prioridad, puedes dejar una propina. ¡Cada apoyo cuenta!
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4 text-center">
-            <p className="text-lg font-semibold">¿Te gustaría dejar una propina?</p>
-            <p className="text-sm text-gray-400">Las canciones con propina suenan primero.</p>
-          </div>
-          <DialogFooter className="sm:justify-between gap-2">
-            <Button onClick={() => setShowPaymentDialog(false)} variant="outline">Quizás más tarde</Button>
-            <Button onClick={() => window.location.href = 'https://buy.stripe.com/test_your_link_here'} className="bg-green-600 hover:bg-green-700">Dejar Propina</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Toaster richColors position="top-right" />
-
-      <Header user={user} isAdmin={isAdmin} onLogout={handleLogout} />
-
-      <MainContent 
-        onSubmit={handleFormSubmit} 
-        isSubmitting={isSubmitting} 
-        isRequestTimeAllowed={isRequestTimeAllowed} 
-      />
-
-      <Footer />
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 };

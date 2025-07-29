@@ -1,30 +1,46 @@
+import React from 'react';
 import { motion } from 'framer-motion';
 import logo from '@/assets/dj-wacko-main-logo.gif';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      when: 'beforeChildren',
+      staggerChildren: 0.2,
+    },
+  },
+  exit: { opacity: 0 },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
 
 const LoadingScreen = () => {
   return (
     <motion.div
-      className="fixed inset-0 flex items-center justify-center bg-black z-50"
-      initial={{ opacity: 1 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.8 }}
+      key="loading-screen"
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-95 backdrop-blur-sm"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
     >
       <motion.img
         src={logo}
-        alt="Loading..."
-        className="w-48 h-48"
-        initial={{ scale: 0.9, opacity: 0.7 }}
-        animate={{
-          scale: [1, 1.05, 1],
-          opacity: [0.7, 1, 0.7],
-        }}
-        transition={{
-          duration: 2.5,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        }}
+        alt="Cargando..."
+        className="w-56 h-56"
+        variants={itemVariants}
       />
+      <motion.p
+        className="mt-4 text-xl font-semibold text-white tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500"
+        variants={itemVariants}
+      >
+        Cargando la experiencia...
+      </motion.p>
     </motion.div>
   );
 };

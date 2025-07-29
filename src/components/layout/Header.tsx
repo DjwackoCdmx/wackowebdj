@@ -41,9 +41,14 @@ export const Header = ({ user, isAdmin, onLogout }: HeaderProps) => {
               )}
             </>
           ) : (
-            <Button asChild variant="outline">
-              <a href="/auth">Iniciar Sesión</a>
-            </Button>
+            <>
+              <Button asChild variant="outline" className="text-white border-purple-400/50 hover:bg-purple-500/20 hover:text-white">
+                <a href="/auth">Iniciar Sesión</a>
+              </Button>
+              <Button asChild className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white">
+                 <a href="/auth?view=sign_up">Registrarse</a>
+              </Button>
+            </>
           )}
         </nav>
       </div>

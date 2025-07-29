@@ -1,5 +1,16 @@
 # Proyecto DJ Wacko - Plataforma de Solicitudes Musicales
 
+## Estado del Proyecto (Julio 2025)
+
+El proyecto ha pasado por una fase de estabilización y refactorización para mejorar su mantenibilidad y corregir errores. Los cambios clave incluyen:
+
+-   **Corrección de Bugs Críticos:** Se ha solucionado un error de compilación causado por una ruta de importación incorrecta después de la reorganización de carpetas.
+-   **Refactorización de Carpetas:** Se han consolidado los componentes de administración en una única carpeta (`src/components/admin-components`) para eliminar duplicados y mejorar la claridad de la estructura del proyecto.
+-   **Solución de Errores de UI:** Se corrigieron varios bugs visuales, como contenido duplicado, imágenes rotas y advertencias en la consola de React.
+-   **Configuración del Entorno:** Se ha mejorado la configuración de VS Code para que sea compatible con las funciones de Supabase (Deno), eliminando falsos errores de TypeScript.
+
+El proyecto se encuentra ahora en un estado estable y listo para continuar con el desarrollo de nuevas funcionalidades.
+
 Bienvenido a la plataforma interactiva de DJ Wacko. Esta aplicación permite a los usuarios solicitar canciones, enviar propinas y mantenerse al día con los eventos del artista.
 
 ## ¿Cómo funciona?
