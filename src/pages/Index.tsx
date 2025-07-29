@@ -15,10 +15,10 @@ import { Badge } from "@/components/ui/badge";
 import djHeroBg from "@/assets/dj-hero-bg.jpg";
 import djWackoMainLogo from "@/assets/dj-wacko-main-logo.gif";
 import djWackoLogoText from "@/assets/dj-wacko-logo-text.png";
-import type { User } from '@supabase/supabase-js';
+import type { User as SupabaseUser } from '@supabase/supabase-js';
 
 interface IndexProps {
-  user: User | null;
+  user: SupabaseUser | null;
   isAdmin: boolean;
 }
 
@@ -61,7 +61,7 @@ export default function Index({ user, isAdmin }: IndexProps) {
 
   const verifyPayment = useCallback(async (sessionId: string) => {
     try {
-      const { data, error } = await fetch('https://api.commerce.coinbase.com/charges/' + sessionId, {
+      const response = await fetch('https://api.commerce.coinbase.com/charges/' + sessionId, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -69,9 +69,11 @@ export default function Index({ user, isAdmin }: IndexProps) {
         },
       });
 
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-      const charge = await data.json();
+      const charge = await response.json();
 
       if (charge.data.status === 'PAID' || charge.data.status === 'COMPLETED') {
         toast({

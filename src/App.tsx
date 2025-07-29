@@ -29,7 +29,7 @@ function App() {
       const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
       setUser(session?.user ?? null);
-      setIsAdmin(!!session);
+      setIsAdmin(session?.user?.user_metadata?.role === 'admin');
       setAuthReady(true);
     };
 
@@ -38,7 +38,7 @@ function App() {
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
-      setIsAdmin(!!session);
+      setIsAdmin(session?.user?.user_metadata?.role === 'admin');
     });
 
     return () => {
