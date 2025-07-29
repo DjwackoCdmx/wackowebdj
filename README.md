@@ -1,4 +1,66 @@
-# Sistema de Propinas para DJ "DJ Wacko" - v1.0
+# Proyecto DJ Wacko - Plataforma de Solicitudes Musicales
+
+Bienvenido a la plataforma interactiva de DJ Wacko. Esta aplicación permite a los usuarios solicitar canciones, enviar propinas y mantenerse al día con los eventos del artista.
+
+![DJ Wacko](src/assets/dj-wacko-main-logo.gif)
+
+## ✨ Características Principales
+
+- **Solicitudes en Tiempo Real:** Envía tus peticiones musicales directamente a la cabina del DJ.
+- **Propinas Integradas:** Apoya al artista con propinas seguras a través de criptomonedas (vía Coinbase Commerce).
+- **Sistema de Autenticación:** Crea tu cuenta para llevar un historial de tus solicitudes.
+- **Panel de Administración:** Interfaz para que el DJ gestione las solicitudes y la configuración del evento.
+- **Diseño Moderno y Adaptable:** Experiencia de usuario fluida en web y móvil.
+- **Aplicación Android:** Descarga el APK para tener la experiencia nativa en tu dispositivo.
+
+## 🚀 Cómo Empezar (Puesta en Marcha)
+
+Sigue estos pasos para ejecutar el proyecto en tu entorno local.
+
+### Prerrequisitos
+
+- [Node.js](https://nodejs.org/) (versión 18 o superior)
+- [pnpm](https://pnpm.io/installation) como gestor de paquetes
+
+### 1. Clonar el Repositorio
+
+```bash
+git clone https://github.com/DjwackoCdmx/wackowebdj.git
+cd wackowebdj
+```
+
+### 2. Instalar Dependencias
+
+```bash
+pnpm install
+```
+
+### 3. Configurar Variables de Entorno
+
+Crea un archivo `.env` en la raíz del proyecto copiando el contenido de `.env.example` (si existe) o añadiendo las siguientes claves de Supabase:
+
+```
+VITE_SUPABASE_URL=TU_URL_DE_SUPABASE
+VITE_SUPABASE_ANON_KEY=TU_LLAVE_ANONIMA_DE_SUPABASE
+```
+
+### 4. Iniciar el Servidor de Desarrollo
+
+```bash
+pnpm dev
+```
+
+La aplicación estará disponible en [http://localhost:5173](http://localhost:5173).
+
+## 🛠️ Para Desarrolladores
+
+Este proyecto sigue una estricta política de documentación para asegurar su mantenibilidad y facilitar la colaboración.
+
+**Toda la información técnica, arquitectura, estructura de directorios y registro de cambios se encuentra en la guía para desarrolladores.**
+
+➡️ **[Consulta la Guía para Desarrolladores (DEVELOPER_GUIDE.md)](./DEVELOPER_GUIDE.md)**
+
+Es **obligatorio** leer y seguir las directrices de este documento antes de realizar cualquier cambio en el código.
 
 [![Descargar APK](https://img.shields.io/badge/Descargar-APK-brightgreen.svg)](https://github.com/DjwackoCdmx/wackowebdj/releases/latest/download/app-release.apk)
 
@@ -11,23 +73,6 @@ Para asegurar que el enlace de descarga directa de la aplicación siempre funcio
 3. **Subir a GitHub:** Crea una nueva release en el repositorio y sube el archivo `app-release.apk` como un "asset" o activo.
 
 **Importante:** El nombre del archivo debe ser exactamente `app-release.apk`. De lo contrario, el botón de descarga en la aplicación no funcionará.
-
-Este proyecto es una aplicación web moderna diseñada para que los DJs gestionen solicitudes de canciones y reciban propinas de manera digital durante sus eventos. El público puede escanear un código QR, acceder a la página, solicitar una canción y enviar una propina, todo desde su celular.
-
-## Características Principales
-
-### Vista Pública
-
-- **Formulario de Solicitud:** Interfaz simple para que el público pida canciones, especifique el artista y envíe una propina.
-- **Múltiples Métodos de Pago:** Integración con Stripe para pagos con tarjeta y Coinbase Commerce para criptomonedas.
-- **Accesibilidad:** Diseño responsivo que funciona en cualquier dispositivo móvil.
-
-### Panel de Administración (Exclusivo para el DJ)
-
-- **Login Seguro:** Acceso protegido para la gestión del evento.
-- **Cola de Solicitudes:** Las canciones solicitadas aparecen en una lista priorizada automáticamente por el monto de la propina.
-- **Historial de Pagos:** Registro de todas las transacciones recibidas.
-- **Gestión en Tiempo Real:** El DJ puede ver y gestionar las solicitudes a medida que llegan.
 
 ## Tecnologías Utilizadas
 

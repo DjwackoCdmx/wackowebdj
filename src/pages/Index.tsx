@@ -10,17 +10,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Music, Heart, DollarSign, Send, Sparkles, User, LogOut, CreditCard, FileText, History, Clock, MessageCircle, Twitter, Download } from "lucide-react";
 import WelcomeModal from "@/components/custom/WelcomeModal";
+import LoadingScreen from '@/components/custom/LoadingScreen';
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import djHeroBg from "@/assets/dj-hero-bg.jpg";
 import djWackoMainLogo from "@/assets/dj-wacko-main-logo.gif";
 import djWackoLogoText from "@/assets/dj-wacko-logo-text.png";
 import type { User as SupabaseUser } from '@supabase/supabase-js';
-
-interface IndexProps {
-  user: SupabaseUser | null;
-  isAdmin: boolean;
-}
 
 const musicGenres = [
   "Reggaeton", "Techno", "House", "Electro", "EDM", "Hip-Hop", "Trap", 
@@ -29,7 +25,10 @@ const musicGenres = [
   "Deep House", "Tech House", "Minimal", "Banda", "Circuit", "Otros"
 ];
 
-export default function Index({ user, isAdmin }: IndexProps) {
+export default function Index() {
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { genreName } = useParams<{ genreName: string }>();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -98,12 +97,31 @@ export default function Index({ user, isAdmin }: IndexProps) {
   }, [toast]);
 
   useEffect(() => {
-    // Show welcome modal only to new visitors (not logged in)
-    const hasSeenModal = localStorage.getItem('hasSeenWelcomeModal');
-    if (!hasSeenModal && !user) {
-      setIsWelcomeModalOpen(true);
-    }
-  }, [user]);
+    const initializeSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user ?? null);
+      setIsAdmin(session?.user?.user_metadata?.role === 'admin');
+
+      const hasSeenModal = localStorage.getItem('hasSeenWelcomeModal');
+      if (!hasSeenModal && !session?.user) {
+        setIsWelcomeModalOpen(true);
+      }
+
+      // Ensure loading screen is visible for a minimum duration
+      setTimeout(() => setLoading(false), 1500);
+    };
+
+    initializeSession();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      setIsAdmin(session?.user?.user_metadata?.role === 'admin');
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
 
   const handleCloseWelcomeModal = () => {
     localStorage.setItem('hasSeenWelcomeModal', 'true');
@@ -173,6 +191,10 @@ export default function Index({ user, isAdmin }: IndexProps) {
       setIsSubmitting(false);
     }
   };
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
