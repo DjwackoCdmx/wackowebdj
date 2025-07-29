@@ -133,13 +133,50 @@ El proyecto ha sido significativamente refactorizado para mejorar la mantenibili
 ```
 src/
 ├── components/
-│   ├── layout/           # Componentes de layout (Header, Footer)
+│   ├── admin/            # Componentes específicos del panel de administración
+│   ├── admin-components/ # Componentes del dashboard administrativo
+│   ├── auth-components/  # Componentes de autenticación (Login, Register)
+│   ├── custom/           # Componentes personalizados (LoadingScreen, WelcomeModal)
+│   ├── history-page/     # Componentes de la página de historial (refactorizado)
+│   │   ├── HistoryTabs.tsx
+│   │   ├── RequestList.tsx
+│   │   ├── SavedList.tsx
+│   │   ├── RequestItem.tsx
+│   │   ├── SavedItem.tsx
+│   │   └── HistoryEmptyState.tsx
+│   ├── layout/           # Componentes de layout (Header, Footer, ProtectedRoute)
+│   │   ├── Header.tsx
+│   │   ├── Footer.tsx
+│   │   ├── LoadingScreen.tsx
+│   │   └── ProtectedRoute.tsx
 │   ├── page-components/  # Componentes específicos de páginas
-│   ├── history-page/     # Componentes de la página de historial
-│   └── ui/              # Componentes base de shadcn/ui
+│   │   ├── MainContent.tsx
+│   │   ├── PaymentDialog.tsx
+│   │   ├── SongRequestForm.tsx
+│   │   ├── WelcomeModal.tsx
+│   │   └── index.ts
+│   └── ui/              # Componentes base de shadcn/ui (51 componentes)
 ├── hooks/               # Custom hooks
-│   └── useUserHistory.ts
-└── pages/               # Páginas principales
-    ├── Index.tsx
-    └── UserHistory.tsx
+│   ├── use-mobile.tsx   # Hook para detectar dispositivos móviles
+│   ├── use-toast.ts     # Hook para notificaciones toast
+│   └── useUserHistory.ts # Hook personalizado para lógica de historial
+├── integrations/        # Integraciones externas
+│   └── supabase/        # Configuración y cliente de Supabase
+├── lib/                 # Utilidades y configuraciones
+├── pages/               # Páginas principales de la aplicación
+│   ├── Admin.tsx        # Panel de administración
+│   ├── Auth.tsx         # Página de autenticación
+│   ├── Index.tsx        # Página principal (refactorizada)
+│   ├── NotFound.tsx     # Página 404
+│   ├── Terms.tsx        # Términos y condiciones
+│   └── UserHistory.tsx  # Historial de usuario (refactorizada)
+├── types/               # Definiciones de tipos TypeScript
+│   ├── database.types.ts # Tipos generados de Supabase
+│   ├── index.ts         # Exportaciones de tipos
+│   └── react-custom-es.d.ts # Tipos personalizados
+├── assets/              # Recursos estáticos (imágenes, logos)
+├── App.tsx              # Componente raíz de la aplicación
+├── main.tsx             # Punto de entrada de la aplicación
+├── index.css            # Estilos globales con Tailwind CSS
+└── vite-env.d.ts        # Tipos de entorno para Vite
 ```
