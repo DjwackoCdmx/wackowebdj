@@ -18,8 +18,8 @@ import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 
 interface IndexProps {
-  appState: 'loading' | 'welcome' | 'ready';
-  onWelcomeAccept: () => void;
+  user: SupabaseUser | null;
+  isAdmin: boolean;
 }
 
 const musicGenres = [
@@ -29,16 +29,14 @@ const musicGenres = [
   "Deep House", "Tech House", "Minimal", "Banda", "Circuit", "Otros"
 ];
 
-const Index = ({ appState, onWelcomeAccept }: IndexProps) => {
+const Index = ({ user, isAdmin }: IndexProps) => {
   const { genreName } = useParams<{ genreName: string }>();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<SupabaseUser | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+
   const [requestsEnabled, setRequestsEnabled] = useState(true);
   const [eventName, setEventName] = useState("Evento Privado");
-  const [isReady, setIsReady] = useState(false);
+  const [isReady, setIsReady] = useState(true); // App.tsx handles loading
   const [formData, setFormData] = useState({
     songName: "",
     artistName: "",
@@ -84,32 +82,6 @@ const Index = ({ appState, onWelcomeAccept }: IndexProps) => {
   
 
   useEffect(() => {
-    const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      setIsReady(true);
-    };
-
-    getSession();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setSession(session);
-      const currentUser = session?.user ?? null;
-      setUser(currentUser);
-      setIsAdmin(!!session);
-    });
-
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
-  }, []);
-
-
-
-
-    useEffect(() => {
     const hasSeenModal = localStorage.getItem('hasSeenWelcomeModal');
     if (!hasSeenModal) {
       setShowWelcomeModal(true);
