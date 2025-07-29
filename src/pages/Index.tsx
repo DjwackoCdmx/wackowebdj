@@ -4,7 +4,7 @@ import { User as SupabaseUser } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { Crown, Heart, User, History, Clock, LogOut, UserPlus, Phone, Twitter } from 'lucide-react';
+import { Crown, Heart, User, History, Clock, LogOut, UserPlus, Phone, Twitter, ListChecks, MessageCircle, Send } from 'lucide-react';
 
 // Import page components from barrel file
 import { SongRequestForm, type SongRequestFormData, WelcomeModal, PaymentDialog } from "@/components/page-components";
@@ -169,8 +169,13 @@ const Index = () => {
             <div className="flex items-center gap-4">
                 <img src={djWackoMainLogo} alt="DJ Wacko Logo" className="w-16 h-16 rounded-full object-cover border-2 border-primary/50" />
                 <div>
-                  <h1 className="text-3xl font-bold text-white tracking-wider">DJ WACKO</h1>
-                  <p className="text-sm text-foreground/70 -mt-1">Plataforma de Solicitudes Musicales</p>
+                  <h3 className="text-lg font-semibold mb-4 text-white flex items-center"><ListChecks className="mr-2 h-5 w-5 text-purple-400"/>Próximos pasos:</h3>
+                  <ol className="space-y-2 text-gray-300">
+                    <li className="flex items-start"><span className="text-purple-400 font-bold mr-2">1.</span> Completa el formulario y acepta los términos.</li>
+                    <li className="flex items-start"><span className="text-purple-400 font-bold mr-2">2.</span> Selecciona método de pago (Stripe/Cripto).</li>
+                    <li className="flex items-start"><span className="text-purple-400 font-bold mr-2">3.</span> Confirma tu pago.</li>
+                    <li className="flex items-start"><span className="text-purple-400 font-bold mr-2">4.</span> ¡Espera confirmación cuando tu canción suene!</li>
+                  </ol>
                 </div>
             </div>
             <nav className="flex items-center gap-2">
@@ -223,10 +228,14 @@ const Index = () => {
               >
                 <Twitter className="w-4 h-4" /> @DjwackoCDMX
               </a>
+              <a href="https://wa.me/5215512345678" target="_blank" rel="noopener noreferrer" className="bg-black/30 p-4 rounded-lg flex items-center justify-center space-x-2 hover:bg-white/20 transition-colors">
+                <MessageCircle className="h-5 w-5 mr-2 text-green-400" />
+                <span>Contrataciones (WhatsApp)</span>
+              </a>
             </div>
 
             {!isRequestTimeAllowed && (
-              <div className="mb-8 p-4 bg-yellow-600/20 border border-yellow-600/30 rounded-lg animate-fade-in">
+              <div className="mt-8 p-6 border border-white/10 rounded-lg bg-black/30 backdrop-blur-sm">
                 <div className="flex items-center justify-center gap-2 text-yellow-400">
                   <Clock className="w-5 h-5" />
                   <span className="font-medium">{scheduleMessage}</span>
@@ -235,9 +244,9 @@ const Index = () => {
             )}
             <div className="flex items-center justify-center gap-2 mb-8 animate-fade-in" style={{ animationDelay: '0.6s' }}>
               <Heart className="w-5 h-5 text-neon-pink animate-pulse" />
-              <span className="text-lg font-medium text-foreground/80">
-                🎵 Solicita tu canción favorita
-              </span>
+              <h1 className="text-5xl md:text-7xl font-black text-white uppercase tracking-wider animate-fade-in-up">
+                DJ Wacko
+              </h1>
               <Heart className="w-5 h-5 text-neon-pink animate-pulse" />
             </div>
           </div>

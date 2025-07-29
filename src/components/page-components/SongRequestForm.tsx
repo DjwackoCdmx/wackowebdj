@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Send, HeartHandshake } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -59,7 +60,7 @@ export const SongRequestForm = ({ onSubmit, isSubmitting, isRequestTimeAllowed, 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!acceptedTerms) {
-      setError("Debes aceptar los términos y condiciones para continuar.");
+      setError("Debes aceptar los <strong>Términos y Condiciones</strong> para continuar.");
       return;
     }
     if (parseFloat(formData.tip) < 50) {
@@ -99,7 +100,7 @@ export const SongRequestForm = ({ onSubmit, isSubmitting, isRequestTimeAllowed, 
             <Label htmlFor="genre">Género Musical</Label>
             <Select onValueChange={handleGenreChange} disabled={!isRequestTimeAllowed}>
               <SelectTrigger>
-                <SelectValue placeholder="Selecciona un género" />
+                <SelectValue placeholder="2. Selecciona tu método de pago (Stripe/Cripto)." />
               </SelectTrigger>
               <SelectContent>
                 {
@@ -129,35 +130,21 @@ export const SongRequestForm = ({ onSubmit, isSubmitting, isRequestTimeAllowed, 
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="tip">Propina (MXN)</Label>
-            <Input id="tip" type="number" placeholder="Mínimo $50 MXN" required min="50" disabled={!isRequestTimeAllowed} value={formData.tip} onChange={handleChange} />
+            <Label htmlFor="tip" className="flex items-center"><HeartHandshake className="mr-2 h-4 w-4 text-pink-400"/> Muestra tu apoyo (USD) *</Label>
+            <Input id="tip" type="number" placeholder="$ 2.00" required min="2" disabled={!isRequestTimeAllowed} value={formData.tip} onChange={handleChange} />
+<p className="text-xs text-muted-foreground pt-1">Desde $2.00 USD - Pequeño gesto que hace posible priorizar tu canción ✨</p>
           </div>
           {error && <p className="text-red-500 text-sm">{error}</p>}
           <div className="flex items-center space-x-2">
             <Checkbox id="terms" checked={acceptedTerms} onCheckedChange={(checked) => setAcceptedTerms(checked as boolean)} disabled={!isRequestTimeAllowed} />
             <label htmlFor="terms" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-              Acepto los{" "}
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="link" className="p-0 h-auto text-purple-400">términos y condiciones</Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Términos y Condiciones</DialogTitle>
-                    <DialogDescription className="text-gray-300 pt-4">
-                      <p>1. La propina mínima es de $50 MXN.</p>
-                      <p>2. El DJ se reserva el derecho de no poner la canción si no la tiene o no encaja con el mood del evento.</p>
-                      <p>3. En caso de no poner la canción, se reembolsará la propina.</p>
-                    </DialogDescription>
-                  </DialogHeader>
-                </DialogContent>
-              </Dialog>
+              Acepto los <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-purple-400 underline hover:text-purple-300">términos y condiciones</a>
             </label>
           </div>
         </CardContent>
         <CardFooter>
-          <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700" disabled={!isRequestTimeAllowed || isSubmitting}>
-            {isSubmitting ? "Procesando..." : "Enviar Solicitud"}
+          <Button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition-transform transform hover:scale-105" disabled={!isRequestTimeAllowed || isSubmitting}>
+            <Send className="mr-2 h-4 w-4" /> {isSubmitting ? 'Enviando...' : 'Enviar Mi Solicitud'}
           </Button>
         </CardFooter>
       </form>

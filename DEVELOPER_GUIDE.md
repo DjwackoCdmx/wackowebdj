@@ -72,9 +72,9 @@ Dj_propiona_eb/
 - **Componente(s) Afectado(s):** `src/pages/Index.tsx`, `src/pages/Auth.tsx`
 - **Descripción del Problema/Cambio:** Se necesitaba mejorar la experiencia de los nuevos usuarios y la accesibilidad de la información de contacto. La página principal solo tenía un botón de "Iniciar Sesión", lo que podía ser confuso para quienes deseaban registrarse. Además, la información de contacto (WhatsApp, Twitter) no estaba visible.
 - **Solución Implementada:**
-  1.  En `Index.tsx`, se reemplazó el botón único por dos botones distintos: "Iniciar Sesión" y "Registrarse".
-  2.  Se añadió una sección de contacto prominente con enlaces directos a WhatsApp y Twitter, utilizando iconos para mejorar la visibilidad.
-  3.  En `Auth.tsx`, se implementó lógica para detectar el estado de navegación, permitiendo que el clic en "Registrarse" lleve directamente al formulario de registro, creando un flujo de usuario más intuitivo.
+  1. En `Index.tsx`, se reemplazó el botón único por dos botones distintos: "Iniciar Sesión" y "Registrarse".
+  2. Se añadió una sección de contacto prominente con enlaces directos a WhatsApp y Twitter, utilizando iconos para mejorar la visibilidad.
+  3. En `Auth.tsx`, se implementó lógica para detectar el estado de navegación, permitiendo que el clic en "Registrarse" lleve directamente al formulario de registro, creando un flujo de usuario más intuitivo.
 - **Desarrollador:** Cascade (asistente de IA)
 
 ---
@@ -83,9 +83,9 @@ Dj_propiona_eb/
 - **Componente(s) Afectado(s):** `src/pages/Index.tsx`, `src/pages/Auth.tsx`
 - **Descripción del Problema/Cambio:** Se necesitaba mejorar la experiencia de los nuevos usuarios y la accesibilidad de la información de contacto. La página principal solo tenía un botón de "Iniciar Sesión", lo que podía ser confuso para quienes deseaban registrarse. Además, la información de contacto (WhatsApp, Twitter) no estaba visible.
 - **Solución Implementada:**
-  1.  En `Index.tsx`, se reemplazó el botón único por dos botones distintos: "Iniciar Sesión" y "Registrarse".
-  2.  Se añadió una sección de contacto prominente con enlaces directos a WhatsApp y Twitter, utilizando iconos para mejorar la visibilidad.
-  3.  En `Auth.tsx`, se implementó lógica para detectar el estado de navegación, permitiendo que el clic en "Registrarse" lleve directamente al formulario de registro, creando un flujo de usuario más intuitivo.
+  1. En `Index.tsx`, se reemplazó el botón único por dos botones distintos: "Iniciar Sesión" y "Registrarse".
+  2. Se añadió una sección de contacto prominente con enlaces directos a WhatsApp y Twitter, utilizando iconos para mejorar la visibilidad.
+  3. En `Auth.tsx`, se implementó lógica para detectar el estado de navegación, permitiendo que el clic en "Registrarse" lleve directamente al formulario de registro, creando un flujo de usuario más intuitivo.
 - **Desarrollador:** Cascade (asistente de IA)
 
 ---
