@@ -11,6 +11,8 @@ El proyecto ha pasado por una fase de estabilización y refactorización para me
 
 El proyecto se encuentra ahora en un estado estable y listo para continuar con el desarrollo de nuevas funcionalidades.
 
+-   **Sistema de Administración Restaurado:** Se reparó el historial de migraciones de Supabase, permitiendo la correcta aplicación del sistema de roles y restaurando el acceso al panel de administración.
+
 Bienvenido a la plataforma interactiva de DJ Wacko. Esta aplicación permite a los usuarios solicitar canciones, enviar propinas y mantenerse al día con los eventos del artista.
 
 ## ¿Cómo funciona?

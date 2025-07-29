@@ -6,28 +6,28 @@ Esta guía documenta la estructura del proyecto, las decisiones clave de desarro
 
 El proyecto sigue una estructura organizada para separar las preocupaciones y facilitar la mantenibilidad.
 
--   `src/`
-    -   `assets/`: Imágenes, GIFs y otros recursos estáticos.
-    -   `components/`: Componentes de React reutilizables.
-        -   `ui/`: Componentes base de ShadCN (Button, Card, etc.). **No modificar directamente.**
-        -   `layout/`: Componentes estructurales (Header, Footer, LoadingScreen, ProtectedRoute).
-        -   `page-components/`: Componentes complejos específicos de una página (e.g., `SongRequestForm`, `WelcomeModal`).
-        -   `admin-components/`: Componentes exclusivos para el panel de administración. (Carpeta `admin` fue consolidada aquí).
-        -   `auth-components/`: Componentes para las páginas de autenticación.
-    -   `hooks/`: Hooks de React personalizados (e.g., `use-toast`).
-    -   `integrations/`: Clientes y configuraciones para servicios externos (e.g., Supabase).
-    -   `pages/`: Componentes que representan páginas completas y se asocian a rutas.
-    -   `types/`: Definiciones de tipos de TypeScript globales.
--   `supabase/`
-    -   `functions/`: Funciones Edge de Supabase escritas en Deno.
+- `src/`
+  - `assets/`: Imágenes, GIFs y otros recursos estáticos.
+  - `components/`: Componentes de React reutilizables.
+    - `ui/`: Componentes base de ShadCN (Button, Card, etc.). **No modificar directamente.**
+    - `layout/`: Componentes estructurales (Header, Footer, LoadingScreen, ProtectedRoute).
+    - `page-components/`: Componentes complejos específicos de una página (e.g., `SongRequestForm`, `WelcomeModal`).
+    - `admin-components/`: Componentes exclusivos para el panel de administración. (Carpeta `admin` fue consolidada aquí).
+    - `auth-components/`: Componentes para las páginas de autenticación.
+  - `hooks/`: Hooks de React personalizados (e.g., `use-toast`).
+  - `integrations/`: Clientes y configuraciones para servicios externos (e.g., Supabase).
+  - `pages/`: Componentes que representan páginas completas y se asocian a rutas.
+  - `types/`: Definiciones de tipos de TypeScript globales.
+- `supabase/`
+  - `functions/`: Funciones Edge de Supabase escritas en Deno.
 
 ## 2. Configuración del Entorno de Desarrollo
 
 ### Prerrequisitos
--   Node.js (v18+)
--   pnpm (o npm/yarn)
--   Extensión de VS Code: `Tailwind CSS IntelliSense`
--   Extensión de VS Code: `Deno`
+- Node.js (v18+)
+- pnpm (o npm/yarn)
+- Extensión de VS Code: `Tailwind CSS IntelliSense`
+- Extensión de VS Code: `Deno`
 
 ### Configuración de VS Code (`.vscode/settings.json`)
 
@@ -37,16 +37,37 @@ Para asegurar que el editor de código entienda tanto la sintaxis de Tailwind CS
 
 Se realizó una sesión de estabilización y refactorización que abordó los siguientes puntos:
 
--   **Refactorización de Carpetas:** Se consolidó la carpeta duplicada `src/components/admin` dentro de `src/components/admin-components` para mantener una estructura de proyecto limpia y consistente.
--   **Corrección de Rutas:** Se verificó y completó el enrutador principal en `App.tsx`, asegurando que todas las páginas, incluida la ruta protegida `/admin`, estén correctamente registradas.
--   **Solución de Bugs de UI:**
-    -   Se eliminó el contenido duplicado en la página principal (`Index.tsx`).
-    -   Se corrigió la ruta de la imagen rota en el modal de bienvenida (`WelcomeModal.tsx`).
-    -   Se solucionó la advertencia de `key` duplicada en el formulario de solicitud de canciones (`SongRequestForm.tsx`).
-    -   Se habilitó el enlace a "Términos y Condiciones" registrando su ruta.
--   **Configuración del Editor:** Se ajustó `settings.json` para proporcionar IntelliSense correcto para las funciones de Supabase (Deno), eliminando falsos positivos de errores de TypeScript.
+- **Refactorización de Carpetas:** Se consolidó la carpeta duplicada `src/components/admin` dentro de `src/components/admin-components` para mantener una estructura de proyecto limpia y consistente.
+- **Corrección de Rutas:** Se verificó y completó el enrutador principal en `App.tsx`, asegurando que todas las páginas, incluida la ruta protegida `/admin`, estén correctamente registradas.
+- **Solución de Bugs de UI:**
+  - Se eliminó el contenido duplicado en la página principal (`Index.tsx`).
+  - Se corrigió la ruta de la imagen rota en el modal de bienvenida (`WelcomeModal.tsx`).
+  - Se solucionó la advertencia de `key` duplicada en el formulario de solicitud de canciones (`SongRequestForm.tsx`).
+  - Se habilitó el enlace a "Términos y Condiciones" registrando su ruta.
+- **Configuración del Editor:** Se ajustó `settings.json` para proporcionar IntelliSense correcto para las funciones de Supabase (Deno), eliminando falsos positivos de errores de TypeScript.
 
 Este documento contiene toda la información técnica necesaria para entender, mantener y extender el proyecto.
+
+## 4. Gestión de Migraciones de Supabase (Solución de Problemas)
+
+Se ha resuelto un problema crítico de desincronización con las migraciones de Supabase. A continuación se detalla el problema y la solución implementada, que sirve como guía para futuros mantenimientos.
+
+### Problema
+
+-   **Desincronización del Historial:** El historial de migraciones en la base de datos remota de Supabase no coincidía con los archivos de migración locales.
+-   **Nombres de Archivo Inválidos:** Algunos archivos de migración no seguían el formato `YYYYMMDDHHMMSS_nombre.sql`, lo que causaba que la CLI de Supabase los ignorara.
+-   **Funciones Inexistentes:** A pesar de que el historial indicaba que una migración se había aplicado, las funciones SQL (como `set_admin_by_email`) no existían en la base de datos, impidiendo la asignación de roles de administrador.
+
+### Solución
+
+El proceso para resincronizar la base de datos fue el siguiente:
+
+1. **Renombrar Archivos de Migración:** Se corrigieron los nombres de todos los archivos en `supabase/migrations/` para que siguieran el formato de timestamp requerido.
+2. **Reparación del Historial (`supabase migration repair`):** Se utilizó este comando para forzar la alineación del historial remoto con el estado local:
+   - Primero, se marcaron todas las migraciones "fantasma" (las que tenían nombres incorrectos) como `reverted` en el historial remoto para limpiarlo.
+   - Luego, se marcaron todas las migraciones locales válidas como `applied` para que el historial remoto reflejara el estado deseado.
+3. **Aplicación Forzada de Migración (`supabase db push`):** Como el comando `repair` solo actualiza el *historial* pero no ejecuta el SQL, la función de admin seguía sin existir. Se solucionó revirtiendo la migración específica del admin en el historial (`repair --status reverted ...`) y luego ejecutando `npx supabase db push`. Esto forzó a Supabase a leer el archivo SQL y aplicarlo a la base de datos.
+4. **Asignación de Rol:** Finalmente, se asignó el rol de administrador a un usuario ejecutando la función `set_admin_by_email('email@example.com')` directamente en el editor SQL de Supabase.
 
 ## 🚀 Pila Tecnológica (Tech Stack)
 
