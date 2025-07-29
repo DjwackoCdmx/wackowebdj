@@ -25,20 +25,13 @@ function App() {
   const [authReady, setAuthReady] = useState(false);
 
   useEffect(() => {
-    const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
-      setUser(session?.user ?? null);
-      setIsAdmin(session?.user?.user_metadata?.role === 'admin');
-      setAuthReady(true);
-    };
-
-    getSession();
+    setAuthReady(false);
 
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setIsAdmin(session?.user?.user_metadata?.role === 'admin');
+      setAuthReady(true); // This will be called once the initial state is determined.
     });
 
     return () => {
