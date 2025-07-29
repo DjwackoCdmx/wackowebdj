@@ -10,6 +10,14 @@ Bienvenido a la plataforma interactiva de DJ Wacko. Esta aplicación permite a l
 
 ¡Disfruta de la música!
 
+## ✨ Últimas Mejoras
+
+### Refactorización de Componentes (Enero 2025)
+- **Index.tsx**: Dividido en componentes modulares (`Header`, `MainContent`, `Footer`)
+- **UserHistory.tsx**: Refactorizado con custom hook `useUserHistory` y componentes especializados
+- **Arquitectura Mejorada**: Separación clara entre lógica de negocio y presentación
+- **Mantenibilidad**: Código más limpio, legible y fácil de mantener
+
 ## Guía para Desarrolladores
 
 Para información técnica, configuración del proyecto y detalles de la arquitectura, por favor consulta la guía para desarrolladores.

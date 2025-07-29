@@ -123,7 +123,7 @@ export const SongRequestForm = ({ onSubmit, isSubmitting, isRequestTimeAllowed, 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
              <div className="space-y-2">
                 <Label htmlFor="requesterName">Tu Nombre</Label>
-                <Input id="requesterName" placeholder="Tu nombre para el saludo" required disabled={!isRequestTimeAllowed} value={formData.requesterName} onChange={handleChange} />
+                <Input id="requesterName" placeholder="Escribe tu nombre aquí" required disabled={!isRequestTimeAllowed} value={formData.requesterName} onChange={handleChange} />
             </div>
              <div className="space-y-2">
                 <Label htmlFor="telegram">Usuario de Telegram (Opcional)</Label>

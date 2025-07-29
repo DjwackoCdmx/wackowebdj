@@ -89,3 +89,57 @@ Para evitar este problema en el futuro, se debe regenerar el archivo de tipos de
 ```bash
 pnpm supabase gen types --local > src/types/supabase.ts
 ```
+
+## 🏗️ Arquitectura de Componentes
+
+### Refactorización Reciente (Enero 2025)
+
+El proyecto ha sido significativamente refactorizado para mejorar la mantenibilidad y escalabilidad:
+
+#### Index.tsx - Página Principal
+
+**Antes:** Un componente monolítico de 200+ líneas con toda la lógica y UI mezclada.
+
+**Después:** Dividido en componentes especializados:
+
+- `src/components/layout/Header.tsx` - Encabezado con navegación y autenticación
+- `src/components/page-components/MainContent.tsx` - Contenido principal y formulario
+- `src/components/layout/Footer.tsx` - Pie de página con enlaces
+
+#### UserHistory.tsx - Página de Historial
+
+**Antes:** Un componente complejo con lógica de estado, llamadas a API y renderizado mezclados.
+
+**Después:** Arquitectura limpia con separación de responsabilidades:
+
+- `src/hooks/useUserHistory.ts` - Custom hook con toda la lógica de negocio
+- `src/components/history-page/HistoryTabs.tsx` - Navegación entre pestañas
+- `src/components/history-page/RequestList.tsx` - Lista de solicitudes
+- `src/components/history-page/SavedList.tsx` - Lista de canciones guardadas
+- `src/components/history-page/RequestItem.tsx` - Tarjeta individual de solicitud
+- `src/components/history-page/SavedItem.tsx` - Tarjeta individual de canción guardada
+- `src/components/history-page/HistoryEmptyState.tsx` - Estados vacíos reutilizables
+
+### Beneficios de la Refactorización
+
+1. **Mantenibilidad:** Cada componente tiene una responsabilidad única
+2. **Reutilización:** Los componentes pueden ser reutilizados en otras partes
+3. **Testabilidad:** Componentes más pequeños son más fáciles de testear
+4. **Legibilidad:** El código es más fácil de entender y navegar
+5. **Escalabilidad:** Nuevas funcionalidades se pueden añadir sin afectar el código existente
+
+### Estructura de Directorios
+
+```
+src/
+├── components/
+│   ├── layout/           # Componentes de layout (Header, Footer)
+│   ├── page-components/  # Componentes específicos de páginas
+│   ├── history-page/     # Componentes de la página de historial
+│   └── ui/              # Componentes base de shadcn/ui
+├── hooks/               # Custom hooks
+│   └── useUserHistory.ts
+└── pages/               # Páginas principales
+    ├── Index.tsx
+    └── UserHistory.tsx
+```
