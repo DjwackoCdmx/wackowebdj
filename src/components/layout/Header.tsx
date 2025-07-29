@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { History, LogOut, Music } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
@@ -25,28 +26,28 @@ export const Header = ({ user, isAdmin, onLogout }: HeaderProps) => {
             <>
               <span className="text-sm text-gray-300 hidden sm:inline">{user.email}</span>
               <Button asChild variant="ghost" className="text-white hover:bg-purple-500/20">
-                <a href="/history">
+                <Link to="/history">
                   <History className="mr-2 h-4 w-4" /> Mi Historial
-                </a>
+                </Link>
               </Button>
               <Button onClick={onLogout} variant="destructive">
                 <LogOut className="mr-2 h-4 w-4" /> Salir
               </Button>
               {isAdmin && (
                 <Button asChild variant="outline">
-                  <a href="/admin">
+                  <Link to="/admin">
                     <Music className="mr-2 h-4 w-4" /> Panel de Admin
-                  </a>
+                  </Link>
                 </Button>
               )}
             </>
           ) : (
             <>
               <Button asChild variant="outline" className="text-white border-purple-400/50 hover:bg-purple-500/20 hover:text-white">
-                <a href="/auth">Iniciar Sesión</a>
+                <Link to="/auth">Iniciar Sesión</Link>
               </Button>
               <Button asChild className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white">
-                 <a href="/auth?view=sign_up">Registrarse</a>
+                <Link to="/auth?view=sign_up">Registrarse</Link>
               </Button>
             </>
           )}
