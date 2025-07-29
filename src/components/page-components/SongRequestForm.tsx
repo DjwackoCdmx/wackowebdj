@@ -105,7 +105,7 @@ export const SongRequestForm = ({ onSubmit, isSubmitting, isRequestTimeAllowed, 
                 <SelectValue placeholder="Selecciona un género musical" />
               </SelectTrigger>
               <SelectContent>
-                {genres.map((genre, index) => (
+                {genres.filter(g => g.toLowerCase() !== 'otro').map((genre, index) => (
                   <SelectItem key={`${genre}-${index}`} value={genre.toLowerCase().replace(/\s&\s/g, '-').replace(/\s/g, '-')}>
                     {genre}
                   </SelectItem>

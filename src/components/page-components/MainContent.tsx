@@ -31,7 +31,7 @@ export const MainContent = ({ onSubmit, isSubmitting, isRequestTimeAllowed }: Ma
             onSubmit={onSubmit}
             isSubmitting={isSubmitting}
             isRequestTimeAllowed={isRequestTimeAllowed}
-            genres={['Rock', 'Pop', '80s', '90s', 'Electrónica', 'Reggaeton', 'Otro']}
+            genres={['Rock', 'Pop', '80s', '90s', 'Electrónica', 'Reggaeton']}
           />
         </div>
         <div className="mt-8 pt-6 border-t border-gray-700/50 flex flex-wrap justify-center items-center gap-4">
