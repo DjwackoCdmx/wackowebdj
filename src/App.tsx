@@ -9,6 +9,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { AnimatePresence } from 'framer-motion';
 
 import LoadingScreen from './components/custom/LoadingScreen';
+import { ProtectedRoute } from './components/layout/ProtectedRoute'; // Import ProtectedRoute
 import Index from './pages/Index';
 import Admin from './pages/Admin';
 import Auth from './pages/Auth';
@@ -27,7 +28,14 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/genre/:genreName" element={<Index />} />
-          <Route path="/admin" element={<Admin />} />
+                    <Route 
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <Admin />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/auth" element={<Auth />} />
           <Route path="/history" element={<UserHistory />} />
           <Route path="/terms" element={<Terms />} />
