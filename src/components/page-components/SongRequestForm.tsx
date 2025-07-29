@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { HeartHandshake, ListChecks, Send, Terminal } from 'lucide-react';
+import { HeartHandshake, ListChecks, Send, Terminal, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -158,8 +158,13 @@ export const SongRequestForm = ({ onSubmit, isSubmitting, isRequestTimeAllowed, 
           {error && <Alert variant="destructive" className="mt-4"><Terminal className="h-4 w-4" /><AlertTitle>Error de Validación</AlertTitle><AlertDescription>{error}</AlertDescription></Alert>}
         </CardContent>
         <CardFooter>
-          <Button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-3 text-lg rounded-lg shadow-lg transition-transform transform hover:scale-105" disabled={!isRequestTimeAllowed || isSubmitting}>
-            <Send className="mr-2 h-5 w-5" /> {isSubmitting ? 'Enviando...' : 'Enviar Mi Solicitud'}
+          <Button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-3 text-lg rounded-lg shadow-lg transition-transform transform hover:scale-105 flex items-center justify-center" disabled={!isRequestTimeAllowed || isSubmitting}>
+            {isSubmitting ? (
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+            ) : (
+              <Send className="mr-2 h-5 w-5" />
+            )}
+            {isSubmitting ? 'Enviando...' : 'Enviar Mi Solicitud'}
           </Button>
         </CardFooter>
       </form>

@@ -1,6 +1,6 @@
 import { SongRequestForm } from "@/components/page-components/SongRequestForm";
 import { Button } from "@/components/ui/button";
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, Phone, Twitter } from 'lucide-react';
 
 interface SongFormData {
   songName: string;
@@ -20,11 +20,11 @@ export const MainContent = ({ onSubmit, isSubmitting, isRequestTimeAllowed }: Ma
   return (
     <main className="flex-grow flex items-center justify-center p-4">
       <div className="w-full max-w-4xl bg-black bg-opacity-50 p-8 rounded-2xl shadow-lg border border-purple-500/30 text-center">
-        <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-2">
+        <h1 className="text-5xl md:text-7xl font-extrabold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
           Tu Música, Tu Momento
         </h1>
         <p className="text-lg md:text-xl text-purple-300 mb-8">
-          Tu música, tu fiesta.
+          Solicita tus canciones favoritas y sé el alma de la fiesta.
         </p>
         <div className="max-w-lg mx-auto">
           <SongRequestForm
@@ -39,6 +39,16 @@ export const MainContent = ({ onSubmit, isSubmitting, isRequestTimeAllowed }: Ma
             <Button asChild variant="electric">
                 <a href="https://t.me/djwacko" target="_blank" rel="noopener noreferrer">
                     <MessageCircle className="mr-2 h-4 w-4" /> Telegram
+                </a>
+            </Button>
+            <Button asChild className="bg-green-600 hover:bg-green-700 text-white">
+                <a href="https://wa.me/5256441274646" target="_blank" rel="noopener noreferrer">
+                    <Phone className="mr-2 h-4 w-4" /> WhatsApp
+                </a>
+            </Button>
+            <Button asChild className="bg-blue-500 hover:bg-blue-600 text-white">
+                <a href="http://x.com/DjWackoCDMX" target="_blank" rel="noopener noreferrer">
+                    <Twitter className="mr-2 h-4 w-4" /> Twitter
                 </a>
             </Button>
         </div>

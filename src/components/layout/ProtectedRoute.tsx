@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Navigate } from 'react-router-dom';
-import LoadingScreen from '@/components/custom/LoadingScreen';
+import LoadingScreen from '@/components/layout/LoadingScreen';
 
 interface ProtectedRouteProps {
   children: React.ReactElement;

@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { motion, AnimatePresence } from 'framer-motion';
 import { Toaster, toast } from "sonner";
 import { Header } from "@/components/layout/Header";
 import { MainContent } from "@/components/page-components/MainContent";
@@ -29,10 +30,7 @@ const Index = () => {
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    const hasSeenModal = localStorage.getItem('hasSeenWelcomeModal');
-    if (!hasSeenModal) {
-      setShowWelcomeModal(true);
-    }
+    setShowWelcomeModal(true);
   }, []);
 
   const handleCloseWelcomeModal = () => {
@@ -142,19 +140,30 @@ const Index = () => {
     <div className="min-h-screen bg-cover bg-center bg-fixed text-white flex flex-col items-center"
          style={{ backgroundImage: `url(${backgroundImage})` }}>
 
-      <Dialog open={showWelcomeModal} onOpenChange={setShowWelcomeModal}>
-        <DialogContent className="bg-gray-800 text-white border-purple-500">
-          <DialogHeader>
-            <DialogTitle className="text-2xl">¡Bienvenido a la Experiencia DJ Wacko!</DialogTitle>
-            <DialogDescription className="text-gray-400 pt-2">
-              Aquí puedes pedir tus canciones favoritas y ser parte de la fiesta. Si te gusta lo que hago, ¡considera apoyarme con una propina!
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button onClick={handleCloseWelcomeModal} className="bg-purple-600 hover:bg-purple-700">¡Entendido!</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <AnimatePresence>
+        {showWelcomeModal && (
+          <Dialog open={showWelcomeModal} onOpenChange={setShowWelcomeModal}>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.3 }}
+            >
+              <DialogContent className="bg-gray-800 text-white border-purple-500">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl">¡Bienvenido a la Experiencia DJ Wacko!</DialogTitle>
+                  <DialogDescription className="text-gray-400 pt-2">
+                    Aquí puedes pedir tus canciones favoritas y ser parte de la fiesta. Si te gusta lo que hago, ¡considera apoyarme con una propina!
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button onClick={handleCloseWelcomeModal} className="bg-purple-600 hover:bg-purple-700">¡Entendido!</Button>
+                </DialogFooter>
+              </DialogContent>
+            </motion.div>
+          </Dialog>
+        )}
+      </AnimatePresence>
 
       <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
         <DialogContent className="bg-gray-800 text-white border-green-500">

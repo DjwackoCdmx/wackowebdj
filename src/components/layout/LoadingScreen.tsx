@@ -1,21 +1,31 @@
+import { motion } from 'framer-motion';
 import logo from '@/assets/dj-wacko-main-logo.gif';
 
 const LoadingScreen = () => {
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background/95 backdrop-blur-sm animate-fade-in">
-      <div className="relative mb-8 animate-[zoomIn_0.8s_cubic-bezier(0.25,1,0.5,1)]">
-        <div className="absolute -inset-2 rounded-full bg-primary/50 animate-[glow_2.5s_ease-in-out_infinite]" />
-        <img src={logo} alt="DJ Wacko Logo" className="relative w-40 h-40 rounded-full" />
-      </div>
-      
-      <p className="text-xl font-semibold text-white mb-6 animate-[pulse_2s_ease-in-out_infinite]">
-        Cargando la experiencia...
-      </p>
-
-      <div className="w-64 h-2 bg-white/10 rounded-full overflow-hidden">
-        <div className="h-full bg-primary rounded-full animate-[progress_2s_linear_infinite]"></div>
-      </div>
-    </div>
+    <motion.div
+      className="fixed inset-0 flex items-center justify-center bg-black z-50"
+      initial={{ opacity: 1 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.8 }}
+    >
+      <motion.img
+        src={logo}
+        alt="Loading..."
+        className="w-48 h-48"
+        initial={{ scale: 0.9, opacity: 0.7 }}
+        animate={{
+          scale: [1, 1.05, 1],
+          opacity: [0.7, 1, 0.7],
+        }}
+        transition={{
+          duration: 2.5,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        }}
+      />
+    </motion.div>
   );
 };
 

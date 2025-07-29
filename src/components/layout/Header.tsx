@@ -17,7 +17,7 @@ export const Header = ({ user, isAdmin, onLogout }: HeaderProps) => {
           <img src={djWackoMainLogo} alt="DJ Wacko Logo" className="w-12 h-12 rounded-full object-cover border-2 border-primary/50" />
           <div>
             <h2 className="text-xl font-bold text-white tracking-wider">DJ Wacko</h2>
-            <p className="text-xs text-purple-300">Panel de Control</p>
+            <p className="text-sm text-gray-300">La Música Que Marca la Diferencia</p>
           </div>
         </div>
         <nav className="flex items-center gap-2">
