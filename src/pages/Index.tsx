@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useSearchParams, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,17 +9,16 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Music, Heart, DollarSign, Send, Sparkles, User, LogOut, CreditCard, FileText, History, Clock, MessageCircle, Twitter, Download } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import djHeroBg from "@/assets/dj-hero-bg.jpg";
-import djWackoMainLogo from "@/assets/dj-wacko-main-logo.gif";
-import djWackoLogoText from "@/assets/dj-wacko-logo-text.png";
-import type { User as SupabaseUser, Session } from "@supabase/supabase-js";
 import WelcomeModal from "@/components/custom/WelcomeModal";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
+import djHeroBg from "@/assets/dj-hero-bg.jpg";
+import djWackoMainLogo from "@/assets/dj-wacko-main-logo.gif";
+import djWackoLogoText from "@/assets/dj-wacko-logo-text.png";
+import type { User } from '@supabase/supabase-js';
 
 interface IndexProps {
-  user: SupabaseUser | null;
+  user: User | null;
   isAdmin: boolean;
 }
 
@@ -29,35 +29,51 @@ const musicGenres = [
   "Deep House", "Tech House", "Minimal", "Banda", "Circuit", "Otros"
 ];
 
-const Index = ({ user, isAdmin }: IndexProps) => {
+export default function Index({ user, isAdmin }: IndexProps) {
   const { genreName } = useParams<{ genreName: string }>();
   const { toast } = useToast();
   const navigate = useNavigate();
 
   const [requestsEnabled, setRequestsEnabled] = useState(true);
   const [eventName, setEventName] = useState("Evento Privado");
-  const [isReady, setIsReady] = useState(true); // App.tsx handles loading
   const [formData, setFormData] = useState({
-    songName: "",
-    artistName: "",
-    requesterName: "",
-    genre: "",
-    tip: "2.00",
-    telegram: "",
+    songName: '',
+    artistName: '',
+    requesterName: '',
+    genre: '',
+    otherGenre: '',
+    tip: '2.00',
+    telegram: '',
   });
+
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  }, []);
+
+  const handleGenreChange = useCallback((value: string) => {
+    setFormData(prev => ({ ...prev, genre: value }));
+  }, []);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const verifyPayment = useCallback(async (sessionId: string) => {
     try {
-      const { data, error } = await supabase.functions.invoke('verify-stripe-session', {
-        body: { session_id: sessionId },
+      const { data, error } = await fetch('https://api.commerce.coinbase.com/charges/' + sessionId, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CC-Api-Key': '5722a856-a1c9-4f3d-9a67-8a8211545417',
+        },
       });
 
       if (error) throw error;
 
-      if (data.payment_status === 'paid') {
+      const charge = await data.json();
+
+      if (charge.data.status === 'PAID' || charge.data.status === 'COMPLETED') {
         toast({
           title: "✅ ¡Pago verificado!",
           description: "Tu solicitud ha sido confirmada y priorizada.",
@@ -79,18 +95,16 @@ const Index = ({ user, isAdmin }: IndexProps) => {
     }
   }, [toast]);
 
-  
-
   useEffect(() => {
     const hasSeenModal = localStorage.getItem('hasSeenWelcomeModal');
     if (!hasSeenModal) {
-      setShowWelcomeModal(true);
+      setIsWelcomeModalOpen(true);
     }
   }, []);
 
   const handleCloseWelcomeModal = () => {
-    setShowWelcomeModal(false);
     localStorage.setItem('hasSeenWelcomeModal', 'true');
+    setIsWelcomeModalOpen(false);
   };
 
   const handleSignOut = async () => {
@@ -159,7 +173,7 @@ const Index = ({ user, isAdmin }: IndexProps) => {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
-      <WelcomeModal open={showWelcomeModal} onAccept={handleCloseWelcomeModal} />
+      <WelcomeModal open={isWelcomeModalOpen} onAccept={handleCloseWelcomeModal} />
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url(${djHeroBg})` }}
@@ -172,11 +186,6 @@ const Index = ({ user, isAdmin }: IndexProps) => {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-primary rounded-full blur-3xl opacity-10 animate-pulse" style={{ animationDelay: '2s' }} />
       </div>
       <div className="relative container mx-auto px-4 z-10">
-        {!isReady ? (
-          <div className="flex justify-center items-center min-h-screen">
-            <div className="loader"></div>
-          </div>
-        ) : (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="w-full">
             <header className="flex justify-between items-center py-4">
               <img src={djWackoMainLogo} alt="DJ Wacko Logo" className="h-12 w-auto" />
@@ -201,9 +210,9 @@ const Index = ({ user, isAdmin }: IndexProps) => {
                 Toco de todos los géneros en <strong>clubs, antros</strong> y eventos exclusivos 🔥
               </p>
 
-              {/* Social Media Links Restored */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6 mb-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-                <a href="https://wa.me/5256441274646" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 bg-green-600/20 text-green-400 rounded-lg hover:bg-green-600/30 transition-all duration-300 hover-scale">
+              {/* Social Media Links Corrected */}
+              <div className="flex items-center justify-center gap-4 mt-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+                <a href="https://wa.me/525644127464" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 bg-green-600/20 text-green-400 rounded-lg hover:bg-green-600/30 transition-all duration-300 hover-scale">
                   <MessageCircle className="w-5 h-5" /> Contrataciones
                 </a>
                 <a href="https://twitter.com/DjwackoCDMX" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 bg-blue-600/20 text-blue-400 rounded-lg hover:bg-blue-600/30 transition-all duration-300 hover-scale">
@@ -229,13 +238,54 @@ const Index = ({ user, isAdmin }: IndexProps) => {
                     <CardTitle className="text-center text-2xl">Haz tu solicitud - {eventName}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                      <div className="space-y-2 animate-fade-in" style={{ animationDelay: '0.8s' }}><Label htmlFor="songName" className="text-sm font-medium text-foreground">🎵 Nombre de la canción *</Label><Input id="songName" placeholder="Ej: Gasolina" value={formData.songName} onChange={(e) => setFormData({ ...formData, songName: e.target.value })} className="bg-background/50 border-primary/30 focus:border-primary focus:scale-105 transition-all duration-300" required /></div>
-                      <div className="space-y-2 animate-fade-in" style={{ animationDelay: '1s' }}><Label htmlFor="artistName" className="text-sm font-medium text-foreground">👨‍🎤 Artista *</Label><Input id="artistName" placeholder="Ej: Daddy Yankee" value={formData.artistName} onChange={(e) => setFormData({ ...formData, artistName: e.target.value })} className="bg-background/50 border-primary/30 focus:border-primary focus:scale-105 transition-all duration-300" required /></div>
-                      <div className="space-y-2"><Label htmlFor="requesterName">Tu nombre *</Label><Input id="requesterName" value={formData.requesterName} onChange={(e) => setFormData({ ...formData, requesterName: e.target.value })} required /></div>
-                      <div className="space-y-2"><Label htmlFor="genre">Género musical</Label><Select onValueChange={(value) => setFormData({ ...formData, genre: value })} value={formData.genre}><SelectTrigger><SelectValue placeholder="Selecciona un género" /></SelectTrigger><SelectContent>{musicGenres.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}</SelectContent></Select></div>
-                      <div className="space-y-2"><Label htmlFor="tip">Propina (USD)</Label><Input id="tip" type="number" min="2.00" step="0.50" value={formData.tip} onChange={(e) => setFormData({ ...formData, tip: e.target.value })} /></div>
-                      <div className="flex items-center space-x-2"><Checkbox id="terms" checked={acceptedTerms} onCheckedChange={(c) => setAcceptedTerms(c as boolean)} /><label htmlFor="terms" className="text-sm leading-none">Acepto los <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline">términos y condiciones</a></label></div>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      {/* Tu Nombre */}
+                      <motion.div className="space-y-2" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+                        <Label htmlFor="requesterName">Tu Nombre (Opcional)</Label>
+                        <Input id="requesterName" name="requesterName" placeholder="Juan Pérez" value={formData.requesterName} onChange={handleInputChange} className="bg-background/50 border-primary/30 focus:border-primary focus:scale-105 transition-all duration-300 hover-scale" />
+                      </motion.div>
+
+                      {/* Nombre de la Canción */}
+                      <motion.div className="space-y-2" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+                        <Label htmlFor="songName">🎵 Nombre de la Canción *</Label>
+                        <Input id="songName" name="songName" placeholder="Ej: Gasolina" value={formData.songName} onChange={handleInputChange} required className="bg-background/50 border-primary/30 focus:border-primary focus:scale-105 transition-all duration-300 hover-scale" />
+                      </motion.div>
+
+                      {/* Nombre del Artista */}
+                      <motion.div className="space-y-2" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+                        <Label htmlFor="artistName">👨‍🎤 Nombre del Artista *</Label>
+                        <Input id="artistName" name="artistName" placeholder="Ej: Daddy Yankee" value={formData.artistName} onChange={handleInputChange} required className="bg-background/50 border-primary/30 focus:border-primary focus:scale-105 transition-all duration-300 hover-scale" />
+                      </motion.div>
+
+                      {/* Género Musical */}
+                      <motion.div className="space-y-2" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+                        <Label htmlFor="genre">Género Musical</Label>
+                        <Select name="genre" onValueChange={handleGenreChange} value={formData.genre}>
+                          <SelectTrigger className="bg-background/50 border-primary/30 focus:border-primary focus:scale-105 transition-all duration-300 hover-scale">
+                            <SelectValue placeholder="Selecciona un género" />
+                          </SelectTrigger>
+                          <SelectContent>{musicGenres.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}</SelectContent>
+                        </Select>
+                      </motion.div>
+
+                      {/* Campo para Otro Género (condicional) */}
+                      {formData.genre === 'Otros' && (
+                        <motion.div className="space-y-2" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                          <Label htmlFor="otherGenre">Especifica el género</Label>
+                          <Input id="otherGenre" name="otherGenre" placeholder="Ej: Cumbia, Rock, etc." value={formData.otherGenre} onChange={handleInputChange} className="bg-background/50 border-primary/30 focus:border-primary focus:scale-105 transition-all duration-300 hover-scale" />
+                        </motion.div>
+                      )}
+
+                      <motion.div className="space-y-2" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+                        <Label htmlFor="tip">Propina (USD)</Label>
+                        <Input id="tip" type="number" min="2.00" step="0.50" value={formData.tip} onChange={handleInputChange} className="bg-background/50 border-primary/30 focus:border-primary focus:scale-105 transition-all duration-300" />
+                      </motion.div>
+
+                      <motion.div className="flex items-center space-x-2" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
+                        <Checkbox id="terms" checked={acceptedTerms} onCheckedChange={(c) => setAcceptedTerms(c as boolean)} />
+                        <label htmlFor="terms" className="text-sm leading-none">Acepto los <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline">términos y condiciones</a></label>
+                      </motion.div>
+
                       <Button type="submit" disabled={isSubmitting || !acceptedTerms} className="w-full bg-gradient-to-r from-purple-600 to-pink-500 text-white font-bold text-lg h-12 hover:scale-105 transition-transform duration-300">{isSubmitting ? 'Enviando...' : 'Enviar Solicitud'}</Button>
                     </form>
                   </CardContent>
@@ -251,10 +301,7 @@ const Index = ({ user, isAdmin }: IndexProps) => {
               </div>
             </footer>
           </motion.div>
-        )}
       </div>
     </div>
   );
 };
-
-export default Index;

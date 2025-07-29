@@ -24,7 +24,7 @@ function App() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [authReady, setAuthReady] = useState(false);
 
-    useEffect(() => {
+  useEffect(() => {
     const getSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
@@ -46,8 +46,6 @@ function App() {
     };
   }, []);
 
-  
-
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -57,15 +55,15 @@ function App() {
           {!authReady ? (
             <LoadingScreen key="loading" />
           ) : (
-          <Routes>
-                        <Route path="/" element={<Index user={user} isAdmin={isAdmin} />} />
-            <Route path="/genre/:genreName" element={<Index user={user} isAdmin={isAdmin} />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/history" element={<UserHistory />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+            <Routes>
+              <Route path="/" element={<Index user={user} isAdmin={isAdmin} />} />
+              <Route path="/genre/:genreName" element={<Index user={user} isAdmin={isAdmin} />} />
+              <Route path="/admin" element={<Admin />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/history" element={<UserHistory />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
           )}
         </Router>
       </TooltipProvider>
