@@ -1,4 +1,8 @@
-# Proyecto DJ Wacko - Plataforma de Solicitudes Musicales
+# Proyecto DJ Wacko - Plataforma de Solicitudes Musical
+una plataforma web que funcione como una herramienta para DJs, donde los asistentes a un evento puedan hacer solicitudes de canciones con opción de propina. La plataforma prioriza las canciones según el monto donado, y cada DJ tiene un panel de administración personalizado para gestionar las solicitudes en tiempo real. Además, el sistema solo es accesible por DJs invitados o registrados, y el acceso completo al sistema lo controla el desarrollador es la version 1.0.0 en apk android
+
+### Parte 2: Frontend - Interfaz y Lógica
+
 
 ## Estado del Proyecto (Julio 2025)
 

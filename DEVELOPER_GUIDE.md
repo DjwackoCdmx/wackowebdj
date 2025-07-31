@@ -1,5 +1,29 @@
 # Guía para Desarrolladores - Plataforma DJ Wacko
 
+Esta guía proporciona una visión general de la arquitectura del proyecto, las decisiones clave y las mejores prácticas a seguir durante el desarrollo.
+
+## Arquitectura General
+
+El proyecto utiliza el stack T3 (Next.js, TypeScript, Tailwind CSS) con Supabase como backend.
+
+- **Frontend**: Construido con Next.js y componentes de `shadcn/ui`.
+- **Backend**: Supabase maneja la base de datos (PostgreSQL), autenticación y funciones serverless (Edge Functions).
+- **Estilos**: Tailwind CSS para un diseño rápido y responsivo.
+
+## Gestión de Usuarios por Administrador
+
+Se ha implementado una funcionalidad robusta para que los administradores puedan gestionar los usuarios del sistema.
+
+### Componentes Clave:
+
+1.  **Función de Supabase (`delete-user-by-admin`)**: Una Edge Function segura que valida si el solicitante es un administrador antes de permitir la eliminación de un usuario. Utiliza la `SERVICE_ROLE_KEY` para realizar operaciones privilegiadas.
+
+2.  **Panel de Administración (`Admin.tsx`)**: Actúa como el componente contenedor principal. Maneja la obtención de datos de todos los usuarios y contiene la lógica para invocar las funciones de cambio de rol y eliminación.
+
+3.  **Tabla de Gestión (`UserManagementTable.tsx`)**: Un componente de UI reutilizable que muestra la lista de todos los usuarios y proporciona los controles (menús desplegables, diálogos de confirmación) para que el administrador realice acciones.
+
+Para una guía de implementación paso a paso detallada, consulta la sección **"Guía para Implementar Gestión y Eliminación de Usuarios por Administrador"** en el archivo [README.md](./README.md).
+
 Esta guía documenta la estructura del proyecto, las decisiones clave de desarrollo y los procedimientos para mantener y extender la aplicación.
 
 ## 1. Estructura de Carpetas Clave
@@ -246,4 +270,103 @@ src/
 ├── main.tsx             # Punto de entrada de la aplicación
 ├── index.css            # Estilos globales con Tailwind CSS
 └── vite-env.d.ts        # Tipos de entorno para Vite
+```
+
+---
+
+### Parte 1: Backend - Crear la Función Segura en Supabase
+
+#### Paso 1.1: Crear el Archivo de la Función
+
+Crea la siguiente estructura de carpetas y archivos dentro de la carpeta `supabase` de tu proyecto:
+
+```
+supabase/
+└── functions/
+    └── delete-user-by-admin/
+        └── index.ts
+```
+
+Pega el siguiente código en `supabase/functions/delete-user-by-admin/index.ts`:
+
+```typescript
+import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
+import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.39.8'
+
+const isAdmin = async (supabaseClient: SupabaseClient): Promise<boolean> => {
+  const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+  if (userError || !user) return false;
+
+  const { data: profile, error: profileError } = await supabaseClient
+    .from('profiles') // Asegúrate que tu tabla de perfiles se llame 'profiles'
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  return !profileError && profile?.role === 'admin';
+};
+
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: { 
+      'Access-Control-Allow-Origin': '*', 
+      'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type' 
+    } });
+  }
+
+  try {
+    const client = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
+    );
+
+    const isUserAdmin = await isAdmin(client);
+    if (!isUserAdmin) {
+      return new Response(JSON.stringify({ error: 'No autorizado.' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
+    }
+
+    const { user_id_to_delete } = await req.json();
+    if (!user_id_to_delete) {
+      return new Response(JSON.stringify({ error: 'Se requiere user_id_to_delete.' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+    }
+
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(user_id_to_delete);
+    if (deleteError) throw deleteError;
+
+    return new Response(JSON.stringify({ message: 'Usuario eliminado.' }), {
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      status: 200,
+    });
+
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), {
+      headers: { 'Content-Type': 'application/json', 'Access-control-Allow-Origin': '*' },
+      status: 500,
+    });
+  }
+});
+```
+
+#### Paso 1.2: Desplegar la Función
+
+El ID de tu proyecto de Supabase es `fvkbuvjrigtlcqxwopxu`.
+
+**Opción A (Recomendada si Docker falla): Despliegue Manual**
+1.  Ve a tu [Panel de Supabase](https://supabase.com/dashboard) y selecciona el proyecto `fvkbuvjrigtlcqxwopxu`.
+2.  En el menú lateral, ve a **Edge Functions** (icono de rayo ⚡).
+3.  Haz clic en **"Create a new function"**.
+4.  Nombra la función exactamente: `delete-user-by-admin`.
+5.  Borra el código de ejemplo, pega el código del paso anterior y haz clic en **"Create and deploy function"**.
+
+**Opción B (Si Docker funciona): Despliegue con CLI**
+
+Ejecuta este comando desde la raíz de tu proyecto:
+```bash
+supabase functions deploy delete-user-by-admin --no-verify-jwt
 ```

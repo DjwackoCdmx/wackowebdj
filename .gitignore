@@ -1,3 +1,19 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Next.js build output
+/.next/
+/out/
+
+# Production build
+/build
+/dist
+/dist-ssr
+
 # Logs
 logs
 *.log
@@ -7,24 +23,38 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Local dependencies
-node_modules
+# Local environment variables
+.env
+.env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+!/.env.example
 
-# Build artifacts
-dist
-dist-ssr
-*.local
-*.apk
-*.aab
+# Documentation
+DEVELOPER_GUIDE.md
 
-# Editor directories and files
+# IDE & Editor files
+.idea/
 .vscode/*
 !.vscode/extensions.json
-.# misc
-.DS_Store
-local.properties
+*.code-workspace
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Gradle cache
+.gradle/
+
+# Android build artifacts
+*.apk
+*.aab
+android/app/release/
+local.properties
+
+# OS-generated files
+.DS_Store
+*.pem

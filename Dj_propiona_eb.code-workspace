@@ -4,17 +4,16 @@
 			"path": "."
 		},
 		{
-			"path": "../Nex js twl plantillas"
-		},
-		{
-			"path": "../Next plantillas animadas -20250712T224150Z-1-001"
-		},
-		{
 			"path": "D:/Djwackopropinamonorepo"
 		}
 	],
 	"settings": {
-		"powershell.cwd": "Dj_propiona_eb",
-		"java.configuration.updateBuildConfiguration": "automatic"
+		"tailwindCSS.includeLanguages": {
+			"typescript": "typescript",
+			"typescriptreact": "typescriptreact"
+		},
+		"files.associations": {
+			"*.css": "tailwindcss"
+		}
 	}
 }
