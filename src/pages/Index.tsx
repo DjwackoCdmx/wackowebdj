@@ -30,11 +30,8 @@ const Index = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-    useEffect(() => {
-    const hasSeenModal = localStorage.getItem('hasSeenWelcomeModal');
-    if (!hasSeenModal) {
-      setShowWelcomeModal(true);
-    }
+  useEffect(() => {
+    setShowWelcomeModal(true);
   }, []);
 
   const handleCloseWelcomeModal = () => {

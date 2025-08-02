@@ -53,53 +53,10 @@ export const MainContent = ({ onSubmit, isSubmitting, isRequestTimeAllowed }: Ma
             </Button>
             <Button asChild className="bg-indigo-600 hover:bg-indigo-700 text-white">
                 <a href="https://github.com/DjwackoCdmx/wackowebdj/releases/download/v1.0.0/app-release.apk" target="_blank" rel="noopener noreferrer">
-                    <Download className="mr-2 h-4 w-4" /> Descargar la APK
+                    <Download className="mr-2 h-4 w-4" /> Descargar APK
                 </a>
             </Button>
         </div>
-
-        {/* Pricing Section */}
-        <section className="mt-16 w-full">
-          <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-10 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">Nuestros Planes</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            
-            <div className="bg-black bg-opacity-50 p-6 rounded-lg border border-purple-500/30 flex flex-col">
-              <h3 className="text-2xl font-bold mb-4 text-purple-300">Básico</h3>
-              <p className="text-4xl font-bold mb-4">$10<span className="text-lg font-normal">/mes</span></p>
-              <ul className="text-left space-y-2 text-gray-300 flex-grow">
-                <li>✅ 1 Perfil de DJ</li>
-                <li>✅ 50 Solicitudes/mes</li>
-                <li>✅ Página personalizable</li>
-              </ul>
-              <Button variant="outline" className="w-full mt-6">Seleccionar Plan</Button>
-            </div>
-
-            <div className="bg-black bg-opacity-70 p-6 rounded-lg border-2 border-purple-500 shadow-lg shadow-purple-500/20 flex flex-col">
-              <h3 className="text-2xl font-bold mb-4 text-purple-300">Profesional</h3>
-              <p className="text-4xl font-bold mb-4">$25<span className="text-lg font-normal">/mes</span></p>
-              <ul className="text-left space-y-2 text-gray-300 flex-grow">
-                <li>✅ 5 Perfiles de DJ</li>
-                <li>✅ Solicitudes ilimitadas</li>
-                <li>✅ Analíticas avanzadas</li>
-                <li>✅ Soporte prioritario</li>
-              </ul>
-              <Button variant="electric" className="w-full mt-6">Seleccionar Plan</Button>
-            </div>
-
-            <div className="bg-black bg-opacity-50 p-6 rounded-lg border border-purple-500/30 flex flex-col">
-              <h3 className="text-2xl font-bold mb-4 text-purple-300">Empresarial</h3>
-              <p className="text-4xl font-bold mb-4">$50<span className="text-lg font-normal">/mes</span></p>
-              <ul className="text-left space-y-2 text-gray-300 flex-grow">
-                <li>✅ Perfiles ilimitados</li>
-                <li>✅ Marca blanca</li>
-                <li>✅ Integración API</li>
-              </ul>
-              <Button variant="outline" className="w-full mt-6">Contactar</Button>
-            </div>
-
-          </div>
-        </section>
-
       </div>
     </main>
   );
